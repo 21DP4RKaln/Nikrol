@@ -1,0 +1,20 @@
+{
+  "hero": {
+    "title": "Sekojiet saviem mīļākajiem filmām un TV seriāliem",
+    "subtitle": "Izveidojiet savu personīgo filmu bibliotēku, sazinieties ar draugiem un atklājiet jaunu saturu kopā."
+  },
+  "features": {
+    "title": "Viss, kas jums nepieciešams",
+    "subtitle": "Spēcīgas funkcijas, lai uzlabotu jūsu filmu un TV seriālu pieredzi"
+  },
+  "cta": {
+    "title": "Gatavs sākt savu ceļojumu?",
+    "subtitle": "Pievienojieties tūkstošiem filmu entuziastu, kas jau izmanto mūsu platformu",
+    "button": "Reģistrēties bez maksas"
+  },
+  "footer": {
+    "description": "Jūsu personālā filmu un TV seriālu izsekošanas platforma.",
+    "madeWith": "Izveidots ar",
+    "forMovieLovers": "filmu mīļotājiem"
+  }
+}

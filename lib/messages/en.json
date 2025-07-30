@@ -1,0 +1,118 @@
+{
+  "hero": {
+    "title": "Track Your Favorite Movies & TV Shows",
+    "subtitle": "Create your personal movie library, connect with friends, and discover new content together."
+  },
+  "features": {
+    "title": "Everything You Need",
+    "subtitle": "Powerful features to enhance your movie and TV show experience",
+    "library": {
+      "title": "Personal Library",
+      "description": "Create and manage your personal collection of movies and TV shows"
+    },
+    "friends": {
+      "title": "Connect with Friends",
+      "description": "Add friends and see what they're watching and their recommendations"
+    },
+    "ratings": {
+      "title": "Rate & Review",
+      "description": "Rate movies and TV shows, write reviews, and share your thoughts"
+    },
+    "discover": {
+      "title": "Discover Content",
+      "description": "Get personalized recommendations based on your taste and friends' activity"
+    }
+  },
+  "cta": {
+    "title": "Ready to Start Your Journey?",
+    "subtitle": "Join thousands of movie enthusiasts already using our platform",
+    "button": "Sign Up Free"
+  },
+  "about": {
+    "title": "About Movie List",
+    "subtitle": "We're passionate about bringing movie enthusiasts together through a shared love of cinema and television.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "To create the ultimate platform for movie and TV show enthusiasts to discover, track, and share their favorite content with friends and like-minded viewers around the world."
+    },
+    "features": {
+      "title": "What Makes Us Special",
+      "library": {
+        "title": "Personal Library",
+        "description": "Build and organize your personal collection of movies and TV shows with detailed information and ratings."
+      },
+      "social": {
+        "title": "Social Features",
+        "description": "Connect with friends, share recommendations, and discover what others are watching."
+      },
+      "reviews": {
+        "title": "Reviews & Ratings",
+        "description": "Rate and review content, read others' opinions, and make informed viewing decisions."
+      },
+      "privacy": {
+        "title": "Privacy First",
+        "description": "Your data is secure and private. Control who sees your content and personal information."
+      },
+      "recommendations": {
+        "title": "Smart Recommendations",
+        "description": "Get personalized recommendations based on your viewing history and preferences."
+      },
+      "performance": {
+        "title": "Fast & Reliable",
+        "description": "Built with modern technology for a fast, responsive, and reliable user experience."
+      }
+    },
+    "values": {
+      "title": "Our Values",
+      "community": {
+        "title": "Community",
+        "description": "Building connections through shared interests and passions."
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "Delivering the best possible experience with attention to detail."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "Continuously improving and adding new features for our users."
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "We're a passionate team of developers, designers, and movie enthusiasts dedicated to creating the best possible experience for our users. Our diverse backgrounds and shared love for cinema drive us to build something truly special."
+    },
+    "cta": {
+      "title": "Ready to Join Our Community?",
+      "subtitle": "Start building your movie library and connecting with fellow enthusiasts today.",
+      "signup": "Sign Up Free",
+      "home": "Back to Home"
+    }
+  },
+  "footer": {
+    "description": "Your personal movie and TV show tracking platform. Discover, organize, and share your favorite content with friends.",
+    "navigation": {
+      "title": "Navigation",
+      "home": "Home",
+      "about": "About",
+      "dashboard": "Dashboard",
+      "friends": "Friends"
+    },
+    "features": {
+      "title": "Features",
+      "library": "Personal Library",
+      "social": "Social Features",
+      "recommendations": "Recommendations",
+      "reviews": "Reviews & Ratings"
+    },
+    "support": {
+      "title": "Support & Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "contact": "Contact Support",
+      "help": "Help Center"
+    },
+    "copyright": "© {year} Movie List. All rights reserved.",
+    "madeWith": "Made with",
+    "forMovieLovers": "for movie lovers"
+  }
+}
