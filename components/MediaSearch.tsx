@@ -31,19 +31,33 @@ export default function MediaSearch({
   const [hasMore, setHasMore] = useState(false);
   const { toast } = useToast();
 
+  console.log(
+    'MediaSearch initialized with type:',
+    type,
+    'activeTab:',
+    activeTab
+  );
   const searchMedia = useCallback(
     async (searchQuery: string, searchPage = 1, type = 'movie') => {
       if (!searchQuery.trim()) return;
 
+      console.log('searchMedia called with:', {
+        searchQuery,
+        searchPage,
+        type,
+      });
       setLoading(true);
       try {
-        const response = await fetch(
-          `/api/media/search?q=${encodeURIComponent(searchQuery)}&type=${type}&page=${searchPage}`
-        );
+        const url = `/api/media/search?q=${encodeURIComponent(searchQuery)}&type=${type}&page=${searchPage}`;
+        console.log('Making request to:', url);
+
+        const response = await fetch(url);
+        console.log('Response status:', response.status, 'ok:', response.ok);
 
         if (!response.ok) throw new Error('Search failed');
 
         const data = await response.json();
+        console.log('Search results:', data);
 
         if (type === 'tv') {
           if (searchPage === 1) {
@@ -62,6 +76,7 @@ export default function MediaSearch({
         setHasMore(data.page < data.total_pages);
         setPage(searchPage);
       } catch (error) {
+        console.error('Search error:', error);
         toast({
           title: 'Ошибка поиска',
           description: 'Не удалось найти фильмы/сериалы',
@@ -76,14 +91,24 @@ export default function MediaSearch({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      searchMedia(query, 1, activeTab === 'movies' ? 'movie' : 'tv');
+      console.log('Search initiated - query:', query, 'activeTab:', activeTab);
+      const searchType = activeTab === 'movies' ? 'movie' : 'tv';
+      console.log('Search type:', searchType);
+      searchMedia(query, 1, searchType);
       onSearch?.(query);
     }
   };
-
   const loadMore = () => {
     if (hasMore && !loading) {
-      searchMedia(query, page + 1, activeTab === 'movies' ? 'movie' : 'tv');
+      const mediaType = activeTab === 'movies' ? 'movie' : 'tv';
+
+      if (query.trim()) {
+        // Если есть поисковый запрос, загружаем еще результаты поиска
+        searchMedia(query, page + 1, mediaType);
+      } else {
+        // Если нет поискового запроса, загружаем еще популярные
+        loadPopularMedia(mediaType, page + 1);
+      }
     }
   };
 
@@ -176,6 +201,72 @@ export default function MediaSearch({
     );
   };
 
+  // Функция для загрузки популярных фильмов/сериалов
+  const loadPopularMedia = useCallback(
+    async (mediaType: 'movie' | 'tv' = 'movie', page = 1) => {
+      setLoading(true);
+      try {
+        const url = `/api/media/discover?type=${mediaType}&category=popular&page=${page}`;
+        console.log('Loading popular media:', url);
+
+        const response = await fetch(url);
+        console.log('Popular media response:', response.status, response.ok);
+
+        if (!response.ok) throw new Error('Failed to load popular media');
+
+        const data = await response.json();
+        console.log('Popular media data:', data);
+
+        if (mediaType === 'tv') {
+          if (page === 1) {
+            setTvSeries(data.results);
+          } else {
+            setTvSeries(prev => [...prev, ...data.results]);
+          }
+        } else {
+          if (page === 1) {
+            setMovies(data.results);
+          } else {
+            setMovies(prev => [...prev, ...data.results]);
+          }
+        }
+
+        setHasMore(data.page < data.total_pages);
+        setPage(page);
+      } catch (error) {
+        console.error('Error loading popular media:', error);
+        toast({
+          title: 'Ошибка загрузки',
+          description: 'Не удалось загрузить популярные фильмы/сериалы',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
+
+  // Загружаем популярные фильмы/сериалы при первом рендере
+  useEffect(() => {
+    if (movies.length === 0 && tvSeries.length === 0 && !query.trim()) {
+      const initialType = activeTab === 'tv' ? 'tv' : 'movie';
+      loadPopularMedia(initialType);
+    }
+  }, [activeTab, movies.length, tvSeries.length, query, loadPopularMedia]);
+
+  // Загружаем популярные при смене табов
+  useEffect(() => {
+    if (!query.trim()) {
+      const mediaType = activeTab === 'tv' ? 'tv' : 'movie';
+      const currentResults = activeTab === 'tv' ? tvSeries : movies;
+
+      if (currentResults.length === 0) {
+        loadPopularMedia(mediaType);
+      }
+    }
+  }, [activeTab, query, movies.length, tvSeries.length, loadPopularMedia]);
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSearch} className="flex gap-2">
@@ -204,9 +295,13 @@ export default function MediaSearch({
               Сериалы
             </TabsTrigger>
           </TabsList>
-        )}
-
+        )}{' '}
         <TabsContent value="movies" className="space-y-4">
+          <div className="text-sm text-gray-500 mb-2">
+            {query.trim()
+              ? `Найдено фильмов: ${movies.length}`
+              : `Популярные фильмы: ${movies.length}`}
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {movies.map(movie => (
               <MediaCard key={movie.id} media={movie} type="movie" />
@@ -219,9 +314,13 @@ export default function MediaSearch({
               </Button>
             </div>
           )}
-        </TabsContent>
-
+        </TabsContent>{' '}
         <TabsContent value="tv" className="space-y-4">
+          <div className="text-sm text-gray-500 mb-2">
+            {query.trim()
+              ? `Найдено сериалов: ${tvSeries.length}`
+              : `Популярные сериалы: ${tvSeries.length}`}
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {tvSeries.map(tv => (
               <MediaCard key={tv.id} media={tv} type="tv" />

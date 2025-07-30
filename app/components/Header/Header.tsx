@@ -91,59 +91,93 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  const getLogoSrc = () => {
+    if (theme === 'dark') {
+      return '/images/dark-logo.png';
+    } else if (theme === 'light') {
+      return '/images/light-logo.png';
+    } else {
+      // system theme - use media query to detect preference
+      return typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? '/images/dark-logo.png'
+        : '/images/light-logo.png';
+    }
+  };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-100 via-yellow-50 to-gray-800 dark:from-blue-900 dark:via-purple-900 dark:to-purple-800 border-b border-amber-200 dark:border-purple-700 z-50 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
+    <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-50/90 via-orange-50/90 to-red-50/90 dark:from-slate-900/90 dark:via-blue-900/90 dark:to-purple-900/90 border-b border-amber-200/50 dark:border-purple-600/50 z-50 backdrop-blur-lg shadow-lg">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-10 -left-10 w-20 h-20 bg-amber-300/20 dark:bg-purple-500/20 rounded-full animate-pulse"></div>
+        <div className="absolute -top-5 right-20 w-16 h-16 bg-orange-300/20 dark:bg-blue-500/20 rounded-full animate-bounce delay-100"></div>
+        <div className="absolute top-5 right-40 w-12 h-12 bg-red-300/20 dark:bg-indigo-500/20 rounded-full animate-pulse delay-200"></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between h-16">
-          {' '}
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <img
-              src="/images/logo_side.png"
-              alt="Movie List Logo"
-              className="w-8 h-8"
-            />
-          </Link>
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* Enhanced Logo */}
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <img
+                src={getLogoSrc()}
+                alt="Movie List Logo"
+                className="relative w-10 h-10 rounded-full border-2 border-white/20 group-hover:scale-110 transition-transform duration-300"
+              />
+            </div>
+            <div className="hidden sm:block">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+                Nikrol
+              </h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1"></p>
+            </div>
+          </Link>{' '}
+          {/* Enhanced Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className="text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+              className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
             >
-              Home
+              <span className="relative z-10">Home</span>
+              <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </Link>
 
-            {/* Watch Dropdown */}
+            {/* Enhanced Watch Dropdown */}
             <div className="relative" ref={watchDropdownRef}>
               <button
                 onClick={() => setIsWatchDropdownOpen(!isWatchDropdownOpen)}
-                className="flex items-center space-x-1 text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                className="flex items-center space-x-1 text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
               >
-                <Play className="w-4 h-4" />
-                <span>Watch</span>
+                <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:from-amber-400/40 group-hover:to-orange-500/40 dark:group-hover:from-purple-400/40 dark:group-hover:to-blue-500/40 transition-all duration-300">
+                  <Play className="w-4 h-4" />
+                </div>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform ${isWatchDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 transition-all duration-300 ${isWatchDropdownOpen ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {isWatchDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-amber-200 dark:border-purple-700 py-2 z-50">
+                <div className="absolute top-full left-0 mt-2 w-52 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl shadow-2xl border border-amber-200/50 dark:border-purple-700/50 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
                   <Link
                     href="/movies"
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-purple-900/50 transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 transition-all duration-200 group"
                     onClick={() => setIsWatchDropdownOpen(false)}
                   >
-                    <Film className="w-4 h-4 text-amber-600 dark:text-purple-400" />
-                    <span>Movies</span>
+                    <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
+                      <Film className="w-4 h-4 text-amber-600 dark:text-purple-400" />
+                    </div>
+                    <span className="font-medium">Movies</span>
                   </Link>
                   <Link
                     href="/series"
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-purple-900/50 transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 transition-all duration-200 group"
                     onClick={() => setIsWatchDropdownOpen(false)}
                   >
-                    <Tv className="w-4 h-4 text-amber-600 dark:text-purple-400" />
-                    <span>TV Series</span>
+                    <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
+                      <Tv className="w-4 h-4 text-amber-600 dark:text-purple-400" />
+                    </div>
+                    <span className="font-medium">TV Series</span>
                   </Link>
                 </div>
               )}
@@ -151,57 +185,66 @@ export default function Header() {
 
             <Link
               href="/about"
-              className="text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+              className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
             >
-              About
+              <span className="relative z-10">About</span>
+              <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </Link>
 
             {session && (
               <>
                 <Link
                   href="/dashboard"
-                  className="text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                  className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
                 >
-                  Dashboard
+                  <span className="relative z-10">Dashboard</span>
+                  <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Link>
                 <Link
                   href="/friends"
-                  className="text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                  className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
                 >
-                  Friends
+                  <span className="relative z-10">Friends</span>
+                  <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Link>
               </>
             )}
 
-            {/* Language Dropdown */}
+            {/* Enhanced Language Dropdown */}
             <div className="relative" ref={languageDropdownRef}>
               <button
                 onClick={() =>
                   setIsLanguageDropdownOpen(!isLanguageDropdownOpen)
                 }
-                className="flex items-center space-x-1 text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                className="flex items-center space-x-1 text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
               >
-                <Globe className="w-4 h-4" />
-                <span className="uppercase">{getCurrentLocale()}</span>
+                <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:from-amber-400/40 group-hover:to-orange-500/40 dark:group-hover:from-purple-400/40 dark:group-hover:to-blue-500/40 transition-all duration-300">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <span className="uppercase font-semibold">
+                  {getCurrentLocale()}
+                </span>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 transition-all duration-300 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {isLanguageDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-amber-200 dark:border-purple-700 py-2 z-50">
+                <div className="absolute top-full right-0 mt-2 w-44 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl shadow-2xl border border-amber-200/50 dark:border-purple-700/50 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
                   {languages.map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => handleLanguageChange(lang.code)}
-                      className={`flex items-center space-x-3 w-full px-4 py-2 text-left hover:bg-amber-50 dark:hover:bg-purple-900/50 transition-colors ${
+                      className={`flex items-center space-x-3 w-full px-4 py-3 text-left hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 transition-all duration-200 group ${
                         getCurrentLocale() === lang.code
-                          ? 'bg-amber-100 dark:bg-purple-900/30'
+                          ? 'bg-gradient-to-r from-amber-100/50 to-orange-100/50 dark:from-purple-900/40 dark:to-blue-900/40'
                           : ''
                       }`}
                     >
-                      <span className="text-lg">{lang.flag}</span>
-                      <span className="text-gray-700 dark:text-gray-300">
+                      <span className="text-lg group-hover:scale-110 transition-transform duration-200">
+                        {lang.flag}
+                      </span>
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">
                         {lang.name}
                       </span>
                     </button>
@@ -210,22 +253,24 @@ export default function Header() {
               )}
             </div>
 
-            {/* Theme Dropdown */}
+            {/* Enhanced Theme Dropdown */}
             <div className="relative" ref={themeDropdownRef}>
               <button
                 onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-                className="flex items-center space-x-1 text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                className="flex items-center space-x-1 text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
               >
-                {theme === 'light' && <Sun className="w-4 h-4" />}
-                {theme === 'dark' && <Moon className="w-4 h-4" />}
-                {theme === 'system' && <Monitor className="w-4 h-4" />}
+                <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:from-amber-400/40 group-hover:to-orange-500/40 dark:group-hover:from-purple-400/40 dark:group-hover:to-blue-500/40 transition-all duration-300">
+                  {theme === 'light' && <Sun className="w-4 h-4" />}
+                  {theme === 'dark' && <Moon className="w-4 h-4" />}
+                  {theme === 'system' && <Monitor className="w-4 h-4" />}
+                </div>
                 <ChevronDown
-                  className={`w-4 h-4 transition-transform ${isThemeDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 transition-all duration-300 ${isThemeDropdownOpen ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {isThemeDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-amber-200 dark:border-purple-700 py-2 z-50">
+                <div className="absolute top-full right-0 mt-2 w-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl shadow-2xl border border-amber-200/50 dark:border-purple-700/50 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
                   {themes.map(themeOption => {
                     const IconComponent = themeOption.icon;
                     return (
@@ -235,14 +280,16 @@ export default function Header() {
                           setTheme(themeOption.value as any);
                           setIsThemeDropdownOpen(false);
                         }}
-                        className={`flex items-center space-x-3 w-full px-4 py-2 text-left hover:bg-amber-50 dark:hover:bg-purple-900/50 transition-colors ${
+                        className={`flex items-center space-x-3 w-full px-4 py-3 text-left hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 transition-all duration-200 group ${
                           theme === themeOption.value
-                            ? 'bg-amber-100 dark:bg-purple-900/30'
+                            ? 'bg-gradient-to-r from-amber-100/50 to-orange-100/50 dark:from-purple-900/40 dark:to-blue-900/40'
                             : ''
                         }`}
                       >
-                        <IconComponent className="w-4 h-4 text-amber-600 dark:text-purple-400" />
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
+                          <IconComponent className="w-3 h-3 text-amber-600 dark:text-purple-400" />
+                        </div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">
                           {themeOption.label}
                         </span>
                       </button>
@@ -251,16 +298,18 @@ export default function Header() {
                 </div>
               )}
             </div>
-          </nav>
-          {/* Auth Buttons */}
+          </nav>{' '}
+          {/* Enhanced Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             {status === 'loading' ? (
-              <div className="w-8 h-8 animate-spin rounded-full border-2 border-amber-600 dark:border-purple-400 border-t-transparent"></div>
+              <div className="w-8 h-8 animate-spin rounded-full border-3 border-gradient-to-r from-amber-600 to-orange-600 dark:from-purple-400 dark:to-blue-400 border-t-transparent"></div>
             ) : session ? (
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3 px-3 py-2 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50">
+                  <div className="p-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                     {session.user?.name}
                   </span>
                 </div>
@@ -268,19 +317,19 @@ export default function Header() {
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
-                  className="flex items-center space-x-1 border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-purple-500 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                  className="flex items-center space-x-2 border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 hover:scale-105"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Logout</span>
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Link href="/auth/login">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-purple-500 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                    className="border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 hover:scale-105"
                   >
                     Login
                   </Button>
@@ -288,18 +337,18 @@ export default function Header() {
                 <Link href="/auth/login">
                   <Button
                     size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white dark:bg-purple-600 dark:hover:bg-purple-700"
+                    className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white dark:from-purple-600 dark:to-blue-600 dark:hover:from-purple-700 dark:hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
                     Sign Up
                   </Button>
                 </Link>
               </div>
             )}
-          </div>
-          {/* Mobile Menu Button */}
+          </div>{' '}
+          {/* Enhanced Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400"
+            className="md:hidden p-2 rounded-xl text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50 hover:scale-110 transition-all duration-300"
           >
             {isMenuOpen ? (
               <X className="w-6 h-6" />
@@ -309,125 +358,150 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Enhanced Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-amber-200 dark:border-purple-700">
-            <nav className="flex flex-col space-y-3">
+          <div className="md:hidden py-6 border-t border-amber-200/50 dark:border-purple-600/50 bg-gradient-to-r from-white/90 to-amber-50/90 dark:from-gray-900/90 dark:to-purple-900/90 backdrop-blur-lg rounded-b-xl mt-2 mx-4 shadow-xl">
+            <nav className="flex flex-col space-y-4">
               <Link
                 href="/"
-                className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors py-2"
+                className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Home
+                🏠 Home
               </Link>
 
-              {/* Mobile Watch Section */}
-              <div className="space-y-2">
-                <span className="text-gray-800 dark:text-gray-200 font-medium">
-                  Watch
+              {/* Enhanced Mobile Watch Section */}
+              <div className="space-y-3 px-2">
+                <span className="text-gray-800 dark:text-gray-200 font-bold text-lg flex items-center space-x-2">
+                  <Play className="w-5 h-5 text-amber-600 dark:text-purple-400" />
+                  <span>Watch</span>
                 </span>
-                <Link
-                  href="/movies"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors py-2 ml-4"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Film className="w-4 h-4" />
-                  <span>Movies</span>
-                </Link>
-                <Link
-                  href="/series"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors py-2 ml-4"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Tv className="w-4 h-4" />
-                  <span>TV Series</span>
-                </Link>
+                <div className="ml-4 space-y-2">
+                  <Link
+                    href="/movies"
+                    className="flex items-center space-x-3 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
+                      <Film className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">Movies</span>
+                  </Link>
+                  <Link
+                    href="/series"
+                    className="flex items-center space-x-3 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
+                      <Tv className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">TV Series</span>
+                  </Link>
+                </div>
               </div>
 
               <Link
                 href="/about"
-                className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors py-2"
+                className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                About
+                ℹ️ About
               </Link>
               {session && (
                 <>
                   <Link
                     href="/dashboard"
-                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors py-2"
+                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Dashboard
+                    📊 Dashboard
                   </Link>
                   <Link
                     href="/friends"
-                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-colors py-2"
+                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Friends
+                    👥 Friends
                   </Link>
                 </>
               )}
 
-              {/* Mobile Language Section */}
-              <div className="space-y-2 pt-2">
-                <span className="text-gray-800 dark:text-gray-200 font-medium">
-                  Language
+              {/* Enhanced Mobile Language Section */}
+              <div className="space-y-3 pt-4 px-2 border-t border-amber-200/50 dark:border-purple-600/50">
+                <span className="text-gray-800 dark:text-gray-200 font-bold text-lg flex items-center space-x-2">
+                  <Globe className="w-5 h-5 text-amber-600 dark:text-purple-400" />
+                  <span>Language</span>
                 </span>
-                {languages.map(lang => (
-                  <button
-                    key={lang.code}
-                    onClick={() => {
-                      handleLanguageChange(lang.code);
-                      setIsMenuOpen(false);
-                    }}
-                    className={`flex items-center space-x-2 w-full text-left py-2 ml-4 transition-colors ${
-                      getCurrentLocale() === lang.code
-                        ? 'text-amber-600 dark:text-purple-400 font-medium'
-                        : 'text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400'
-                    }`}
-                  >
-                    <span>{lang.flag}</span>
-                    <span>{lang.name}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Theme Section */}
-              <div className="space-y-2 pt-2">
-                <span className="text-gray-800 dark:text-gray-200 font-medium">
-                  Theme
-                </span>
-                {themes.map(themeOption => {
-                  const IconComponent = themeOption.icon;
-                  return (
+                <div className="ml-4 space-y-2">
+                  {languages.map(lang => (
                     <button
-                      key={themeOption.value}
+                      key={lang.code}
                       onClick={() => {
-                        setTheme(themeOption.value as any);
+                        handleLanguageChange(lang.code);
                         setIsMenuOpen(false);
                       }}
-                      className={`flex items-center space-x-2 w-full text-left py-2 ml-4 transition-colors ${
-                        theme === themeOption.value
-                          ? 'text-amber-600 dark:text-purple-400 font-medium'
-                          : 'text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400'
+                      className={`flex items-center space-x-3 w-full text-left py-3 px-4 rounded-lg transition-all duration-300 ${
+                        getCurrentLocale() === lang.code
+                          ? 'text-amber-600 dark:text-purple-400 font-bold bg-gradient-to-r from-amber-100 to-orange-100 dark:from-purple-900/50 dark:to-blue-900/50'
+                          : 'text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30'
                       }`}
                     >
-                      <IconComponent className="w-4 h-4" />
-                      <span>{themeOption.label}</span>
+                      <span className="text-xl">{lang.flag}</span>
+                      <span className="font-medium">{lang.name}</span>
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
 
-              {/* Mobile Auth Section */}
-              <div className="pt-3 border-t border-amber-200 dark:border-purple-700">
+              {/* Enhanced Mobile Theme Section */}
+              <div className="space-y-3 pt-4 px-2 border-t border-amber-200/50 dark:border-purple-600/50">
+                <span className="text-gray-800 dark:text-gray-200 font-bold text-lg flex items-center space-x-2">
+                  {theme === 'light' && (
+                    <Sun className="w-5 h-5 text-amber-600" />
+                  )}
+                  {theme === 'dark' && (
+                    <Moon className="w-5 h-5 text-purple-400" />
+                  )}
+                  {theme === 'system' && (
+                    <Monitor className="w-5 h-5 text-amber-600 dark:text-purple-400" />
+                  )}
+                  <span>Theme</span>
+                </span>
+                <div className="ml-4 space-y-2">
+                  {themes.map(themeOption => {
+                    const IconComponent = themeOption.icon;
+                    return (
+                      <button
+                        key={themeOption.value}
+                        onClick={() => {
+                          setTheme(themeOption.value as any);
+                          setIsMenuOpen(false);
+                        }}
+                        className={`flex items-center space-x-3 w-full text-left py-3 px-4 rounded-lg transition-all duration-300 ${
+                          theme === themeOption.value
+                            ? 'text-amber-600 dark:text-purple-400 font-bold bg-gradient-to-r from-amber-100 to-orange-100 dark:from-purple-900/50 dark:to-blue-900/50'
+                            : 'text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30'
+                        }`}
+                      >
+                        <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20">
+                          <IconComponent className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{themeOption.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Enhanced Mobile Auth Section */}
+              <div className="pt-4 px-2 border-t border-amber-200/50 dark:border-purple-600/50">
                 {session ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2 py-2">
-                      <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3 py-3 px-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50">
+                      <div className="p-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                         {session.user?.name}
                       </span>
                     </div>
@@ -435,19 +509,19 @@ export default function Header() {
                       variant="outline"
                       size="sm"
                       onClick={handleLogout}
-                      className="w-full flex items-center justify-center space-x-1 border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-purple-500 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                      className="w-full flex items-center justify-center space-x-2 border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 py-3"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Logout</span>
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Link href="/auth/login" className="block">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-purple-500 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                        className="w-full border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 py-3"
                       >
                         Login
                       </Button>
@@ -455,7 +529,7 @@ export default function Header() {
                     <Link href="/auth/login" className="block">
                       <Button
                         size="sm"
-                        className="w-full bg-amber-600 hover:bg-amber-700 text-white dark:bg-purple-600 dark:hover:bg-purple-700"
+                        className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white dark:from-purple-600 dark:to-blue-600 dark:hover:from-purple-700 dark:hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 py-3"
                       >
                         Sign Up
                       </Button>
