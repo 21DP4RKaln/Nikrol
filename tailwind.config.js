@@ -121,10 +121,26 @@ module.exports = {
         'medium': '0 8px 30px rgba(0, 0, 0, 0.12)',
         'hard': '0 12px 40px rgba(0, 0, 0, 0.18)',
         'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
-      },
-      backdropBlur: {
+      },      backdropBlur: {
         'xs': '2px',
-      },      backgroundImage: {
+      },
+      animation: {
+        'spin-slow': 'spin 20s linear infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'gradient-x': 'gradient-x 3s ease infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'gradient-x': {
+          '0%, 100%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+        },
+      },
+      backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
         'primary-to-background': 'linear-gradient(to right, var(--primary), var(--background))',

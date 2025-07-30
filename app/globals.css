@@ -606,4 +606,53 @@ html {
   .float-fast {
     animation: floatFast 3s ease-in-out infinite;
   }
+
+  /* Custom animations for footer */
+  .animate-spin-slow {
+    animation: spin 20s linear infinite;
+  }
+
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  /* Floating animation */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Glow effect */
+  .glow {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+  }
+
+  /* Gradient text animation */
+  @keyframes gradient-x {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
+  }
 }
