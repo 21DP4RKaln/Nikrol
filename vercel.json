@@ -6,7 +6,9 @@
         "schedule": "0 0 1 * *"
       }
     ],
-    "buildCommand": "NODE_OPTIONS='--max-old-space-size=3072' NEXT_WEBPACK_CONCURRENCY=1 next build",    "functions": {
+    "buildCommand": "prisma generate --no-engine && NODE_OPTIONS='--max-old-space-size=3072' NEXT_WEBPACK_CONCURRENCY=1 next build",
+    "installCommand": "npm install && npx prisma generate --no-engine",
+    "functions": {
       "app/api/**": {
         "maxDuration": 30
       },
@@ -20,5 +22,8 @@
         "src": "/uploads/(.*)",
         "dest": "/api/uploads/$1"
       }
-    ]
+    ],
+    "env": {
+      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true"
+    }
   }

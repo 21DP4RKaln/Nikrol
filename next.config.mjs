@@ -18,6 +18,10 @@ const nextConfig = {
     poweredByHeader: false, // Remove X-Powered-By header for security
     compiler: {
       removeConsole: process.env.NODE_ENV === 'production', // Remove console logs in production
+    },    // External packages for server
+    serverExternalPackages: ['@prisma/client', 'bcryptjs'],
+    // Vercel specific optimizations
+    experimental: {
     },webpack: (config, { dev, isServer }) => {
       // Disable the default cache
       config.cache = false;
@@ -69,15 +73,24 @@ const nextConfig = {
       // Warning: This allows production builds to successfully complete even if
       // your project has ESLint errors.
       ignoreDuringBuilds: true,
-    },
-    images: {
-      domains: ['localhost'],
+    },    images: {
+      domains: ['localhost', 'vercel-blob.s3.amazonaws.com', 'db.prisma.io'],
       remotePatterns: [
         {
           protocol: 'http',
           hostname: 'localhost',
           port: '3001',
           pathname: '/uploads/**',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.vercel-storage.com',
+          pathname: '/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'image.tmdb.org',
+          pathname: '/**',
         }
       ]
     }

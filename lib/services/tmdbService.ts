@@ -90,15 +90,21 @@ interface TMDbTVDetails extends TMDbTVSeries {
 class TMDbService {
   private apiKey: string;
   private baseUrl = 'https://api.themoviedb.org/3';
-
   constructor() {
-    this.apiKey = process.env.TMDB_API_KEY!;
+    this.apiKey = process.env.TMDB_API_KEY || '';
     if (!this.apiKey) {
-      throw new Error('TMDB_API_KEY is not defined in environment variables');
+      console.warn(
+        'TMDB_API_KEY is not defined in environment variables - TMDb features will be disabled'
+      );
     }
   }
-
   private async makeRequest<T>(endpoint: string): Promise<T> {
+    if (!this.apiKey) {
+      throw new Error(
+        'TMDb API is not available - TMDB_API_KEY not configured'
+      );
+    }
+
     const url = `${this.baseUrl}${endpoint}${endpoint.includes('?') ? '&' : '?'}api_key=${this.apiKey}`;
 
     const response = await fetch(url);

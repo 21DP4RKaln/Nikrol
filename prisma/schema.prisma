@@ -1,6 +1,7 @@
 generator client {
-  provider   = "prisma-client-js"
-  engineType = "binary"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  engineType    = "binary"
 }
 
 datasource db {
@@ -16,18 +17,18 @@ model User {
   lastName            String
   role                Role                 @default(USER)
   isBlocked           Boolean              @default(false)
-  blockReason         String?              @db.Text
+  blockReason         String?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   profileImageUrl     String?
   accounts            Account[]
   auditLogs           AuditLog[]
+  friendRequests      Friendship[]         @relation("FriendRequests")
+  friendships         Friendship[]         @relation("UserFriendships")
+  movies              Movie[]
   passwordResetTokens PasswordResetToken[]
   sessions            Session[]
-  movies              Movie[]
-  friendships         Friendship[]         @relation("UserFriendships")
-  friendRequests      Friendship[]         @relation("FriendRequests")
-  userMediaEntries    UserMediaEntry[]     // Новая связь
+  userMediaEntries    UserMediaEntry[]
 
   @@map("user")
 }
@@ -38,9 +39,9 @@ model AuditLog {
   action     String
   entityType String
   entityId   String   @default("")
-  details    String   @db.Text
+  details    String
   ipAddress  String?  @default("")
-  userAgent  String?  @db.Text
+  userAgent  String?
   createdAt  DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id])
 
@@ -57,17 +58,17 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade, map: "account_user_fk")
 
   @@unique([provider, providerAccountId])
-  @@index([userId], map: "accounts_userId_idx")
+  @@index([userId])
   @@map("accounts")
 }
 
@@ -78,7 +79,7 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "session_user_fk")
 
-  @@index([userId], map: "sessions_userId_idx")
+  @@index([userId])
   @@map("sessions")
 }
 
@@ -94,7 +95,7 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "password_reset_token_user_fk")
 
-  @@index([userId], map: "password_reset_tokens_userId_idx")
+  @@index([userId])
   @@map("password_reset_tokens")
 }
 
@@ -107,28 +108,25 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-// Глобальные фильмы/сериалы из IMDb
 model GlobalMedia {
-  id            String     @id @default(uuid())
-  imdbId        String     @unique // ID из IMDb (например, tt0111161)
-  title         String
-  originalTitle String?
-  description   String?    @db.Text
-  releaseYear   Int?
-  genres        String?    // JSON массив жанров
-  director      String?
-  cast          String?    @db.Text // JSON массив актеров
-  posterUrl     String?
-  backdropUrl   String?
-  type          MediaType  @default(MOVIE)
-  imdbRating    Float?
-  duration      Int?       // в минутах
-  countries     String?    // JSON массив стран
-  languages     String?    // JSON массив языков
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  
-  // Связи с пользовательскими списками
+  id               String           @id @default(uuid())
+  imdbId           String           @unique
+  title            String
+  originalTitle    String?
+  description      String?
+  releaseYear      Int?
+  genres           String?
+  director         String?
+  cast             String?
+  posterUrl        String?
+  backdropUrl      String?
+  type             MediaType        @default(MOVIE)
+  imdbRating       Float?
+  duration         Int?
+  countries        String?
+  languages        String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   userMediaEntries UserMediaEntry[]
 
   @@index([imdbId])
@@ -138,65 +136,58 @@ model GlobalMedia {
   @@map("global_media")
 }
 
-// Пользовательские записи о фильмах/сериалах
 model UserMediaEntry {
-  id            String          @id @default(uuid())
-  userId        String
-  globalMediaId String
-  status        WatchStatus     @default(WANT_TO_WATCH)
-  userRating    Float?          // личная оценка пользователя (1-10)
-  personalNotes String?         @db.Text
-  watchedAt     DateTime?       // дата просмотра
-  startedAt     DateTime?       // дата начала просмотра
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  
-  // Связи
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  globalMedia   GlobalMedia     @relation(fields: [globalMediaId], references: [id], onDelete: Cascade)
-  
-  // Для сериалов - отслеживание эпизодов
+  id              String            @id @default(uuid())
+  userId          String
+  globalMediaId   String
+  status          WatchStatus       @default(WANT_TO_WATCH)
+  userRating      Float?
+  personalNotes   String?
+  watchedAt       DateTime?
+  startedAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   episodeProgress EpisodeProgress[]
+  globalMedia     GlobalMedia       @relation(fields: [globalMediaId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, globalMediaId])
   @@index([userId])
   @@index([globalMediaId])
   @@map("user_media_entries")
 }
 
-// Прогресс просмотра эпизодов (для сериалов)
 model EpisodeProgress {
-  id              String         @id @default(uuid())
+  id               String         @id @default(uuid())
   userMediaEntryId String
-  season          Int
-  episode         Int
-  watched         Boolean        @default(false)
-  watchedAt       DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
-  userMediaEntry  UserMediaEntry @relation(fields: [userMediaEntryId], references: [id], onDelete: Cascade)
+  season           Int
+  episode          Int
+  watched          Boolean        @default(false)
+  watchedAt        DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  userMediaEntry   UserMediaEntry @relation(fields: [userMediaEntryId], references: [id], onDelete: Cascade)
 
   @@unique([userMediaEntryId, season, episode])
   @@index([userMediaEntryId])
   @@map("episode_progress")
 }
 
-// Старая модель Movie (для совместимости, можно будет удалить позже)
 model Movie {
-  id            String     @id @default(uuid())
-  title         String
-  description   String?    @db.Text
-  releaseYear   Int?
-  genre         String?
-  director      String?
-  posterUrl     String?
-  type          MediaType  @default(MOVIE)
-  rating        Float?
-  duration      Int?       // в минутах
-  userId        String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  releaseYear Int?
+  genre       String?
+  director    String?
+  posterUrl   String?
+  type        MediaType @default(MOVIE)
+  rating      Float?
+  duration    Int?
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([type])
@@ -205,14 +196,14 @@ model Movie {
 }
 
 model Friendship {
-  id          String           @id @default(uuid())
-  userId      String
-  friendId    String
-  status      FriendshipStatus @default(PENDING)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  user        User             @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
-  friend      User             @relation("FriendRequests", fields: [friendId], references: [id], onDelete: Cascade)
+  id        String           @id @default(uuid())
+  userId    String
+  friendId  String
+  status    FriendshipStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  friend    User             @relation("FriendRequests", fields: [friendId], references: [id], onDelete: Cascade)
+  user      User             @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, friendId])
   @@index([userId])
@@ -233,12 +224,12 @@ enum FriendshipStatus {
 }
 
 enum WatchStatus {
-  WANT_TO_WATCH    // Хочу посмотреть
-  WATCHING         // Смотрю сейчас
-  WATCHED          // Просмотрено
-  ON_HOLD          // Приостановлено
-  DROPPED          // Брошено
-  REWATCHING       // Пересматриваю
+  WANT_TO_WATCH
+  WATCHING
+  WATCHED
+  ON_HOLD
+  DROPPED
+  REWATCHING
 }
 
 enum Role {

@@ -20,21 +20,38 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'IvaPro PC Configurator',
-    template: '%s | IvaPro PC Configurator',
+    default: 'Movie List - Your Personal Movie Collection',
+    template: '%s | Movie List',
   },
   description:
-    'Build your custom PC or choose from our ready-made configurations. Professional computer building with quality components.',
+    'Manage your personal movie collection, track watched films, create wishlists, and discover new movies with friends.',
   keywords: [
-    'PC configurator',
-    'custom PC',
-    'computer building',
-    'gaming PC',
-    'custom computer',
+    'movie list',
+    'movie tracker',
+    'film collection',
+    'movie database',
+    'watchlist',
+    'movie reviews',
   ],
-  authors: [{ name: 'IvaPro' }],
-  creator: 'IvaPro',
-  publisher: 'IvaPro',
+  authors: [{ name: 'Movie List Team' }],
+  creator: 'Movie List',
+  publisher: 'Movie List',
+  metadataBase: new URL(process.env.NEXTAUTH_URL || 'https://localhost:3000'),
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: process.env.NEXTAUTH_URL || 'https://localhost:3000',
+    title: 'Movie List - Your Personal Movie Collection',
+    description:
+      'Manage your personal movie collection, track watched films, and discover new movies.',
+    siteName: 'Movie List',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Movie List - Your Personal Movie Collection',
+    description:
+      'Manage your personal movie collection, track watched films, and discover new movies.',
+  },
 };
 
 export const viewport: Viewport = {
