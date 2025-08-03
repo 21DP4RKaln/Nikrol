@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/app/components/ui/button';
 import {
@@ -16,13 +16,17 @@ import {
   StarIcon as Star,
   ArrowTrendingUpIcon as TrendingUp,
   PlayIcon as Play,
+  TvIcon as Tv,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import MovieWaterfall from './MovieWaterfall';
+import { useStats } from '@/app/hooks/useStats';
 
 export default function HeroSection() {
   const t = useTranslations();
+  const locale = useLocale();
   const { data: session } = useSession();
+  const { stats } = useStats();
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -53,13 +57,13 @@ export default function HeroSection() {
                 {' '}
                 <h1 className="text-5xl md:text-7xl font-bold text-gray-800 dark:text-white leading-tight">
                   <span className="bg-gradient-to-r from-amber-600 to-orange-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                    Следите
+                    {t('hero.watchTitle')}
                   </span>
                   <br />
-                  за любимыми
+                  {t('hero.watchSubtitle')}
                   <br />
                   <span className="inline-flex items-center gap-3">
-                    фильмами
+                    {t('hero.watchContent')}
                     <Film className="w-12 h-12 md:w-16 md:h-16 text-amber-600 dark:text-blue-400" />
                   </span>
                 </h1>
@@ -72,73 +76,75 @@ export default function HeroSection() {
               {session ? (
                 <div className="flex flex-col sm:flex-row gap-4">
                   {' '}
-                  <Link href="/dashboard">
+                  <Link href={`/${locale}/list`}>
+                    {' '}
                     <Button
                       size="lg"
                       className="text-lg px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <Play className="w-5 h-5 mr-2" />
-                      Перейти в панель
+                      {t('hero.buttons.goToDashboard')}
                     </Button>
                   </Link>
-                  <Link href="/friends">
+                  <Link href={`/${locale}/friends`}>
                     <Button
                       variant="outline"
                       size="lg"
                       className="text-lg px-8 py-4 border-2 border-gray-600/50 dark:border-white/30 text-gray-800 dark:text-white hover:bg-gray-200/20 dark:hover:bg-white/10 backdrop-blur-sm hover:border-gray-600 dark:hover:border-white/50 transition-all duration-200"
                     >
                       <Users className="w-5 h-5 mr-2" />
-                      Найти друзей
+                      {t('hero.buttons.findFriends')}
                     </Button>
                   </Link>
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-4">
                   {' '}
-                  <Link href="/auth/login">
+                  <Link href={`/${locale}/auth/login`}>
+                    {' '}
                     <Button
                       size="lg"
                       className="text-lg px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <Play className="w-5 h-5 mr-2" />
-                      Начать путешествие
+                      {t('hero.buttons.startJourney')}
                     </Button>
                   </Link>
-                  <Link href="/about">
+                  <Link href={`/${locale}/about`}>
                     <Button
                       variant="outline"
                       size="lg"
                       className="text-lg px-8 py-4 border-2 border-gray-600/50 dark:border-white/30 text-gray-800 dark:text-white hover:bg-gray-200/20 dark:hover:bg-white/10 backdrop-blur-sm hover:border-gray-600 dark:hover:border-white/50 transition-all duration-200"
                     >
-                      Узнать больше
+                      {t('hero.buttons.learnMore')}
                     </Button>
                   </Link>
                 </div>
-              )}
+              )}{' '}
               {/* Stats Preview */}{' '}
               <div className="flex gap-8 pt-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-600 dark:text-blue-400">
-                    10K+
+                    {stats?.movies || '10к+'}
                   </div>
                   <div className="text-gray-600 dark:text-gray-300 text-sm">
-                    Фильмов в базе
+                    {t('hero.stats.moviesInDatabase')}
                   </div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-orange-600 dark:text-purple-400">
-                    5K+
+                    {stats?.tvSeries || '5к+'}
                   </div>
                   <div className="text-gray-600 dark:text-gray-300 text-sm">
-                    Активных пользователей
+                    {t('hero.stats.seriesInDatabase')}
                   </div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-gray-700 dark:text-indigo-400">
-                    25K+
+                    {stats?.users || '3к+'}
                   </div>
                   <div className="text-gray-600 dark:text-gray-300 text-sm">
-                    Отзывов написано
+                    {t('hero.stats.activeUsers')}
                   </div>
                 </div>
               </div>
@@ -152,13 +158,13 @@ export default function HeroSection() {
                   <div className="flex items-center gap-4 mb-4">
                     <div className="p-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 dark:from-blue-500 dark:to-purple-500">
                       <Film className="w-6 h-6 text-white" />
-                    </div>
+                    </div>{' '}
                     <div>
                       <h3 className="text-gray-800 dark:text-white font-semibold">
-                        Личная библиотека
+                        {t('hero.personalLibrary.title')}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300 text-sm">
-                        Управляйте коллекцией
+                        {t('hero.personalLibrary.description')}
                       </p>
                     </div>
                   </div>
@@ -256,35 +262,39 @@ export default function HeroSection() {
           <div className="container mx-auto px-4 py-16">
             {' '}
             <div className="bg-gray-100/80 dark:bg-white/10 backdrop-blur-xl border border-gray-300/50 dark:border-white/20 rounded-2xl shadow-xl p-8">
+              {' '}
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-                  С возвращением, {session.user?.name}!
+                  {t('hero.welcomeBack', { name: session.user?.name })}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Готовы продолжить строить свою коллекцию фильмов?
+                  {t('hero.readyToContinue')}
                 </p>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div>
                   <div className="text-3xl font-bold text-amber-600 dark:text-blue-400 mb-2">
                     0
                   </div>
                   <div className="text-gray-600 dark:text-gray-300">
-                    Фильмы и сериалы
+                    {t('hero.personalStats.moviesAndSeries')}
                   </div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-orange-600 dark:text-purple-400 mb-2">
                     0
                   </div>
-                  <div className="text-gray-600 dark:text-gray-300">Друзья</div>
+                  <div className="text-gray-600 dark:text-gray-300">
+                    {t('hero.personalStats.friends')}
+                  </div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-gray-700 dark:text-indigo-400 mb-2">
                     0
                   </div>
-                  <div className="text-gray-600 dark:text-gray-300">Отзывы</div>
+                  <div className="text-gray-600 dark:text-gray-300">
+                    {t('hero.personalStats.reviews')}
+                  </div>
                 </div>
               </div>
             </div>
@@ -303,7 +313,7 @@ export default function HeroSection() {
                 {t('cta.subtitle') ||
                   'Присоединяйтесь к тысячам киноманов, уже использующих нашу платформу'}
               </p>
-              <Link href="/auth/login">
+              <Link href={`/${locale}/auth/register`}>
                 <Button
                   size="lg"
                   variant="secondary"

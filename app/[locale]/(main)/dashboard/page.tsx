@@ -4,56 +4,70 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { Plus, Search, Users, Film, Tv } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Phone,
+  Lock,
+  Save,
+  ArrowLeft,
+  Edit,
+  Calendar,
+  UserCheck,
+  Sparkles,
+  Shield,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { MediaType } from '@prisma/client';
-import MovieCard from '@/app/components/Movies/MovieCard';
-import MovieFormModal from '@/app/components/Movies/MovieFormModal';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
+import AvatarUpload from '@/app/components/ui/AvatarUpload';
+import LanguageSwitcher from '@/app/components/ui/LanguageSwitcher';
+import FloatingParticles from '@/app/components/ui/FloatingParticles';
+import SuccessAnimation from '@/app/components/ui/SuccessAnimation';
+import ProfileCompletionIndicator from '@/app/components/ui/ProfileCompletionIndicator';
+import { useTranslations } from 'next-intl';
 
-interface Movie {
+interface UserProfile {
   id: string;
-  title: string;
-  description?: string;
-  releaseYear?: number;
-  genre?: string;
-  director?: string;
-  posterUrl?: string;
-  type: MediaType;
-  rating?: number;
-  duration?: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  profileImageUrl?: string;
+  role: string;
   createdAt: string;
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    profileImageUrl?: string;
-  };
+  updatedAt: string;
 }
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useAuth();
   const { toast } = useToast();
-
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const t = useTranslations();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [dataLoading, setDataLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | MediaType>('all');
-  const [userFilter, setUserFilter] = useState<'all' | 'my'>('all');
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMovie, setEditingMovie] = useState<Movie | undefined>();
-  const [modalLoading, setModalLoading] = useState(false);
+  // Формы
+  const [profileForm, setProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    profileImageUrl: '',
+  });
+
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -62,41 +76,33 @@ export default function DashboardPage() {
     }
 
     if (isAuthenticated) {
-      fetchMovies();
+      fetchProfile();
     }
   }, [loading, isAuthenticated, router]);
 
-  useEffect(() => {
-    filterMovies();
-  }, [movies, searchQuery, typeFilter, userFilter, user]);
-
-  // Слушатель для события открытия модального окна из Header
-  useEffect(() => {
-    const handleOpenAddMovieModal = () => {
-      openCreateModal();
-    };
-
-    window.addEventListener('openAddMovieModal', handleOpenAddMovieModal);
-    return () => {
-      window.removeEventListener('openAddMovieModal', handleOpenAddMovieModal);
-    };
-  }, []);
-
-  const fetchMovies = async () => {
+  const fetchProfile = async () => {
     setDataLoading(true);
     try {
-      const response = await fetch('/api/movies');
+      const response = await fetch('/api/profile');
       if (response.ok) {
-        const data = await response.json();
-        setMovies(data);
+        const userData = await response.json();
+        setProfile(userData);
+        setProfileForm({
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          email: userData.email || '',
+          phone: userData.phone || '',
+          profileImageUrl: userData.profileImageUrl || '',
+        });
       } else {
-        throw new Error('Failed to fetch movies');
+        throw new Error('Failed to fetch profile');
       }
     } catch (error) {
-      console.error('Error fetching movies:', error);
+      console.error('Error fetching profile:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить фильмы',
+        title: t('profile.messages.profileLoadError') || 'Error',
+        description:
+          t('profile.messages.profileLoadError') || 'Failed to load profile',
         variant: 'destructive',
       });
     } finally {
@@ -104,298 +110,676 @@ export default function DashboardPage() {
     }
   };
 
-  const filterMovies = () => {
-    let filtered = [...movies];
-
-    // Фильтр по поиску
-    if (searchQuery) {
-      filtered = filtered.filter(
-        movie =>
-          movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.director?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          movie.genre?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Фильтр по типу
-    if (typeFilter !== 'all') {
-      filtered = filtered.filter(movie => movie.type === typeFilter);
-    }
-
-    // Фильтр по пользователю
-    if (userFilter === 'my' && user) {
-      filtered = filtered.filter(movie => movie.user.id === user.id);
-    }
-
-    setFilteredMovies(filtered);
+  const handleAvatarUpdate = (newImageUrl: string) => {
+    setProfile(prev =>
+      prev ? { ...prev, profileImageUrl: newImageUrl } : null
+    );
+    setProfileForm(prev => ({ ...prev, profileImageUrl: newImageUrl }));
   };
 
-  const handleCreateMovie = async (data: any) => {
-    setModalLoading(true);
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+
     try {
-      const response = await fetch('/api/movies', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        const newMovie = await response.json();
-        setMovies(prev => [newMovie, ...prev]);
-        toast({
-          title: 'Успешно!',
-          description: 'Фильм добавлен',
-        });
-        closeModal();
-      } else {
-        throw new Error('Failed to create movie');
-      }
-    } catch (error) {
-      console.error('Error creating movie:', error);
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось добавить фильм',
-        variant: 'destructive',
-      });
-    } finally {
-      setModalLoading(false);
-    }
-  };
-
-  const handleEditMovie = async (data: any) => {
-    if (!editingMovie) return;
-
-    setModalLoading(true);
-    try {
-      const response = await fetch(`/api/movies/${editingMovie.id}`, {
+      const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(profileForm),
       });
 
+      const data = await response.json();
       if (response.ok) {
-        const updatedMovie = await response.json();
-        setMovies(prev =>
-          prev.map(movie =>
-            movie.id === editingMovie.id ? updatedMovie : movie
-          )
-        );
+        setProfile(data.user);
+        setShowSuccessAnimation(true);
         toast({
-          title: 'Успешно!',
-          description: 'Фильм обновлён',
+          title: t('profile.messages.profileUpdated') || 'Success!',
+          description:
+            t('profile.messages.profileUpdated') || 'Profile updated',
         });
-        closeModal();
       } else {
-        throw new Error('Failed to update movie');
+        throw new Error(data.error || 'Failed to update profile');
       }
-    } catch (error) {
-      console.error('Error updating movie:', error);
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось обновить фильм',
+        title: t('profile.messages.profileUpdateError') || 'Error',
+        description:
+          error.message ||
+          t('profile.messages.profileUpdateError') ||
+          'Failed to update profile',
         variant: 'destructive',
       });
     } finally {
-      setModalLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleDeleteMovie = async (movieId: string) => {
-    if (!confirm('Вы уверены, что хотите удалить этот фильм?')) return;
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    try {
-      const response = await fetch(`/api/movies/${movieId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setMovies(prev => prev.filter(movie => movie.id !== movieId));
-        toast({
-          title: 'Успешно!',
-          description: 'Фильм удалён',
-        });
-      } else {
-        throw new Error('Failed to delete movie');
-      }
-    } catch (error) {
-      console.error('Error deleting movie:', error);
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось удалить фильм',
+        title: t('profile.messages.passwordMismatch') || 'Error',
+        description:
+          t('profile.messages.passwordMismatch') ||
+          'New passwords do not match',
         variant: 'destructive',
       });
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: t('profile.messages.passwordTooShort') || 'Error',
+        description:
+          t('profile.messages.passwordTooShort') ||
+          'Password must be at least 6 characters long',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+        setShowSuccessAnimation(true);
+        toast({
+          title: t('profile.messages.passwordChanged') || 'Success!',
+          description:
+            t('profile.messages.passwordChanged') || 'Password changed',
+        });
+      } else {
+        throw new Error(data.error || 'Failed to update password');
+      }
+    } catch (error: any) {
+      console.error('Error updating password:', error);
+      toast({
+        title: t('profile.messages.passwordChangeError') || 'Error',
+        description:
+          error.message ||
+          t('profile.messages.passwordChangeError') ||
+          'Failed to change password',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
-  const openCreateModal = () => {
-    setEditingMovie(undefined);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (movie: Movie) => {
-    setEditingMovie(movie);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingMovie(undefined);
-  };
-
-  if (loading) {
+  if (loading || dataLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-gray-100 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 flex justify-center items-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-16 h-16 border-4 border-amber-400 dark:border-purple-400 border-t-transparent rounded-full"
+        />
       </div>
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !profile) {
     return null;
   }
-
-  const movieCount = filteredMovies.filter(
-    m => m.type === MediaType.MOVIE
-  ).length;
-  const seriesCount = filteredMovies.filter(
-    m => m.type === MediaType.TV_SERIES
-  ).length;
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Мои фильмы и сериалы</h1>
-          <p className="text-gray-600">
-            {movieCount} фильмов, {seriesCount} сериалов
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-gray-100 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 relative overflow-hidden">
+      {/* Success Animation Overlay */}
+      <SuccessAnimation
+        isVisible={showSuccessAnimation}
+        message={t('profile.messages.changesSaved') || 'Changes Saved!'}
+        onComplete={() => setShowSuccessAnimation(false)}
+      />
 
-        <div className="flex gap-3">
-          <Button onClick={() => router.push('/friends')} variant="outline">
-            <Users className="h-4 w-4 mr-2" />
-            Друзья
-          </Button>
-          <Button onClick={openCreateModal}>
-            <Plus className="h-4 w-4 mr-2" />
-            Добавить
-          </Button>
-        </div>
-      </div>
+      {/* Floating Particles Background */}
+      <FloatingParticles count={15} />
 
-      {/* Фильтры */}
-      <div className="flex flex-wrap gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
-        <div className="flex-1 min-w-64">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Поиск по названию, режиссёру, жанру..."
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchQuery(e.target.value)
-              }
-              className="pl-10"
-            />
-          </div>
-        </div>
+      {/* Decorative Elements */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-amber-300/10 to-orange-400/10 dark:from-purple-500/10 dark:to-blue-600/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-r from-orange-300/10 to-red-400/10 dark:from-blue-500/10 dark:to-indigo-600/10 rounded-full blur-3xl"></div>
 
-        <Select
-          value={typeFilter}
-          onValueChange={(value: any) => setTypeFilter(value)}
-        >
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Все типы</SelectItem>
-            <SelectItem value={MediaType.MOVIE}>
-              <div className="flex items-center gap-2">
-                <Film className="h-4 w-4" />
-                Фильмы
-              </div>
-            </SelectItem>
-            <SelectItem value={MediaType.TV_SERIES}>
-              <div className="flex items-center gap-2">
-                <Tv className="h-4 w-4" />
-                Сериалы
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={userFilter}
-          onValueChange={(value: any) => setUserFilter(value)}
-        >
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Все пользователи</SelectItem>
-            <SelectItem value="my">Только мои</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Список фильмов */}
-      {dataLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-        </div>
-      ) : filteredMovies.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="max-w-md mx-auto">
-            <Film className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Нет фильмов</h3>
-            <p className="text-gray-600 mb-6">
-              {movies.length === 0
-                ? 'Начните добавлять свои любимые фильмы и сериалы'
-                : 'Попробуйте изменить фильтры поиска'}
-            </p>
-            {movies.length === 0 && (
-              <Button onClick={openCreateModal}>
-                <Plus className="h-4 w-4 mr-2" />
-                Добавить первый фильм
-              </Button>
-            )}
-          </div>
-        </div>
-      ) : (
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        {' '}
+        {/* Header */}{' '}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"
         >
-          {filteredMovies.map(movie => (
+          <div className="flex items-center gap-4 flex-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.back()}
+              className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 border-amber-200 dark:border-purple-400/50 hover:bg-amber-50 dark:hover:bg-purple-900/50 backdrop-blur-sm shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {t('profile.back') || 'Back'}
+              </span>
+            </Button>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-3 bg-gradient-to-br from-amber-400 to-orange-500 dark:from-purple-500 dark:to-blue-600 rounded-xl shadow-lg shrink-0">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white truncate">
+                  {t('profile.title') || 'My Profile'}
+                </h1>
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 truncate">
+                  {t('profile.subtitle') || 'Manage your account and settings'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Language Switcher */}
+          <div className="flex items-center gap-3 shrink-0">
+            <LanguageSwitcher variant="compact" />
+          </div>
+        </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Левая колонка - информация о пользователе */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="lg:col-span-1 order-2 lg:order-1"
+          >
+            <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-amber-200 dark:border-purple-400/50 shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-500/20 dark:to-blue-600/20 border-b border-amber-200 dark:border-purple-400/30">
+                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+                  <div className="p-2 bg-amber-400 dark:bg-purple-500 rounded-lg">
+                    <User className="h-5 w-5 text-white" />
+                  </div>
+                  {t('profile.info.title') || 'Profile Information'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6 p-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <motion.div whileHover={{ scale: 1.05 }} className="relative">
+                    <AvatarUpload
+                      currentImageUrl={profile.profileImageUrl}
+                      onImageUpdate={handleAvatarUpdate}
+                      userName={`${profile.firstName} ${profile.lastName}`}
+                    />
+                    <div className="absolute -bottom-2 -right-2 p-1 bg-amber-400 dark:bg-purple-500 rounded-full">
+                      <UserCheck className="h-4 w-4 text-white" />
+                    </div>
+                  </motion.div>
+
+                  <div className="text-center">
+                    <h3 className="font-bold text-xl text-gray-900 dark:text-white">
+                      {profile.firstName} {profile.lastName}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 flex items-center justify-center gap-1 mt-1">
+                      <Mail className="h-4 w-4" />
+                      {profile.email}
+                    </p>
+                    <div className="flex items-center justify-center gap-2 mt-2">
+                      <Shield className="h-4 w-4 text-amber-500 dark:text-purple-400" />
+                      <span className="text-sm text-gray-500 dark:text-gray-400 capitalize bg-amber-100 dark:bg-purple-900/30 px-2 py-1 rounded-full">
+                        {profile.role.toLowerCase()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-amber-200 dark:border-purple-400/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-amber-500 dark:text-purple-400" />
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {t('profile.info.registrationDate') ||
+                          'Registration Date'}
+                        :
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {new Date(profile.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Edit className="h-4 w-4 text-amber-500 dark:text-purple-400" />
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {t('profile.info.lastUpdate') || 'Last Update'}:
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {new Date(profile.updatedAt).toLocaleDateString()}
+                    </span>
+                  </div>{' '}
+                </div>
+              </CardContent>
+            </Card>{' '}
+            {/* Stats Cards */}
             <motion.div
-              key={movie.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4"
             >
-              <MovieCard
-                movie={movie}
-                currentUserId={user?.id}
-                onEdit={openEditModal}
-                onDelete={handleDeleteMovie}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Card className="bg-gradient-to-br from-amber-400/10 to-orange-500/10 dark:from-purple-500/10 dark:to-blue-600/10 border-amber-200/50 dark:border-purple-400/30 overflow-hidden relative">
+                  <CardContent className="p-4 text-center relative z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        delay: 0.5,
+                        type: 'spring',
+                        stiffness: 200,
+                      }}
+                      className="text-2xl font-bold text-amber-600 dark:text-purple-400"
+                    >
+                      12
+                    </motion.div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                      {t('profile.stats.moviesWatched') || 'Movies'}
+                    </div>
+                  </CardContent>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-amber-200/20 dark:bg-purple-400/20 rounded-full -translate-y-8 translate-x-8"></div>
+                </Card>
+              </motion.div>
 
-      <MovieFormModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSubmit={editingMovie ? handleEditMovie : handleCreateMovie}
-        movie={editingMovie}
-        isLoading={modalLoading}
-      />
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Card className="bg-gradient-to-br from-orange-400/10 to-red-500/10 dark:from-blue-500/10 dark:to-indigo-600/10 border-orange-200/50 dark:border-blue-400/30 overflow-hidden relative">
+                  <CardContent className="p-4 text-center relative z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        delay: 0.6,
+                        type: 'spring',
+                        stiffness: 200,
+                      }}
+                      className="text-2xl font-bold text-orange-600 dark:text-blue-400"
+                    >
+                      8
+                    </motion.div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                      {t('profile.stats.tvSeries') || 'TV Series'}
+                    </div>
+                  </CardContent>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-orange-200/20 dark:bg-blue-400/20 rounded-full -translate-y-8 translate-x-8"></div>
+                </Card>{' '}
+              </motion.div>
+            </motion.div>
+            {/* Profile Completion Indicator */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mt-6"
+            >
+              <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-amber-200 dark:border-purple-400/50 shadow-xl">
+                <CardContent className="p-4">
+                  <ProfileCompletionIndicator
+                    profile={{
+                      hasAvatar: !!profile.profileImageUrl,
+                      hasFirstName: !!profile.firstName,
+                      hasLastName: !!profile.lastName,
+                      hasEmail: !!profile.email,
+                      hasPhone: !!profile.phone,
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>{' '}
+          {/* Правая колонка - формы редактирования */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-2 order-1 lg:order-2"
+          >
+            <Tabs defaultValue="profile" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-amber-200 dark:border-purple-400/50">
+                <TabsTrigger
+                  value="profile"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-400 data-[state=active]:to-orange-500 data-[state=active]:dark:from-purple-500 data-[state=active]:dark:to-blue-600 data-[state=active]:text-white"
+                >
+                  <Edit className="h-4 w-4" />
+                  {t('profile.tabs.editProfile') || 'Edit Profile'}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="password"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-400 data-[state=active]:to-orange-500 data-[state=active]:dark:from-purple-500 data-[state=active]:dark:to-blue-600 data-[state=active]:text-white"
+                >
+                  <Lock className="h-4 w-4" />
+                  {t('profile.tabs.changePassword') || 'Change Password'}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="profile">
+                <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-amber-200 dark:border-purple-400/50 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-500/20 dark:to-blue-600/20 border-b border-amber-200 dark:border-purple-400/30">
+                    <CardTitle className="text-gray-900 dark:text-white">
+                      {t('profile.form.basicInfo') || 'Basic Information'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <form onSubmit={handleProfileUpdate} className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-gray-700 dark:text-gray-300">
+                            {t('profile.form.avatar') || 'Profile Avatar'}
+                          </Label>
+                          <div className="flex justify-center">
+                            <motion.div whileHover={{ scale: 1.02 }}>
+                              <AvatarUpload
+                                currentImageUrl={profileForm.profileImageUrl}
+                                onImageUpdate={handleAvatarUpdate}
+                                userName={`${profileForm.firstName} ${profileForm.lastName}`}
+                              />
+                            </motion.div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {' '}
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="firstName"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
+                            {t('profile.form.firstName') || 'First Name'}
+                          </Label>
+                          <motion.div whileFocus={{ scale: 1.01 }}>
+                            <Input
+                              id="firstName"
+                              type="text"
+                              value={profileForm.firstName}
+                              onChange={e =>
+                                setProfileForm({
+                                  ...profileForm,
+                                  firstName: e.target.value,
+                                })
+                              }
+                              placeholder={
+                                t('profile.form.firstNamePlaceholder') ||
+                                'Your first name'
+                              }
+                              required
+                              className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400 transition-all duration-200"
+                            />
+                          </motion.div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="lastName"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
+                            {t('profile.form.lastName') || 'Last Name'}
+                          </Label>
+                          <motion.div whileFocus={{ scale: 1.01 }}>
+                            <Input
+                              id="lastName"
+                              type="text"
+                              value={profileForm.lastName}
+                              onChange={e =>
+                                setProfileForm({
+                                  ...profileForm,
+                                  lastName: e.target.value,
+                                })
+                              }
+                              placeholder={
+                                t('profile.form.lastNamePlaceholder') ||
+                                'Your last name'
+                              }
+                              required
+                              className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400 transition-all duration-200"
+                            />
+                          </motion.div>
+                        </div>
+                      </div>{' '}
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="email"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          {t('profile.form.email') || 'Email'}
+                        </Label>
+                        <motion.div whileFocus={{ scale: 1.01 }}>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={profileForm.email}
+                            onChange={e =>
+                              setProfileForm({
+                                ...profileForm,
+                                email: e.target.value,
+                              })
+                            }
+                            placeholder={
+                              t('profile.form.emailPlaceholder') ||
+                              'your@email.com'
+                            }
+                            required
+                            className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400 transition-all duration-200"
+                          />
+                        </motion.div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="phone"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          {t('profile.form.phone') || 'Phone (optional)'}
+                        </Label>
+                        <motion.div whileFocus={{ scale: 1.01 }}>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            value={profileForm.phone}
+                            onChange={e =>
+                              setProfileForm({
+                                ...profileForm,
+                                phone: e.target.value,
+                              })
+                            }
+                            placeholder={
+                              t('profile.form.phonePlaceholder') ||
+                              '+1 (555) 123-4567'
+                            }
+                            className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400 transition-all duration-200"
+                          />
+                        </motion.div>
+                      </div>
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          type="submit"
+                          disabled={saving}
+                          className="w-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-500 dark:to-blue-600 hover:from-amber-500 hover:to-orange-600 dark:hover:from-purple-600 dark:hover:to-blue-700 text-white font-medium py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          {saving ? (
+                            <div className="flex items-center gap-2">
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{
+                                  duration: 1,
+                                  repeat: Infinity,
+                                  ease: 'linear',
+                                }}
+                                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                              />
+                              {t('profile.form.saving') || 'Saving...'}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Save className="h-4 w-4" />
+                              {t('profile.form.save') || 'Save Changes'}
+                            </div>
+                          )}
+                        </Button>
+                      </motion.div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="password">
+                <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-amber-200 dark:border-purple-400/50 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-500/20 dark:to-blue-600/20 border-b border-amber-200 dark:border-purple-400/30">
+                    <CardTitle className="text-gray-900 dark:text-white">
+                      {t('profile.tabs.changePassword') || 'Change Password'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <form onSubmit={handlePasswordUpdate} className="space-y-6">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="currentPassword"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          {t('profile.form.currentPassword') ||
+                            'Current Password'}
+                        </Label>
+                        <Input
+                          id="currentPassword"
+                          type="password"
+                          value={passwordForm.currentPassword}
+                          onChange={e =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              currentPassword: e.target.value,
+                            })
+                          }
+                          placeholder={
+                            t('profile.form.currentPasswordPlaceholder') ||
+                            'Enter current password'
+                          }
+                          required
+                          className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="newPassword"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          {t('profile.form.newPassword') || 'New Password'}
+                        </Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          value={passwordForm.newPassword}
+                          onChange={e =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              newPassword: e.target.value,
+                            })
+                          }
+                          placeholder={
+                            t('profile.form.newPasswordPlaceholder') ||
+                            'Enter new password (minimum 6 characters)'
+                          }
+                          required
+                          minLength={6}
+                          className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="confirmPassword"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          {t('profile.form.confirmPassword') ||
+                            'Confirm New Password'}
+                        </Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          value={passwordForm.confirmPassword}
+                          onChange={e =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              confirmPassword: e.target.value,
+                            })
+                          }
+                          placeholder={
+                            t('profile.form.confirmPasswordPlaceholder') ||
+                            'Confirm new password'
+                          }
+                          required
+                          minLength={6}
+                          className="bg-white/80 dark:bg-gray-900/80 border-amber-200 dark:border-purple-400/50 focus:border-amber-400 dark:focus:border-purple-400"
+                        />
+                      </div>
+
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          type="submit"
+                          disabled={saving}
+                          className="w-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-500 dark:to-blue-600 hover:from-amber-500 hover:to-orange-600 dark:hover:from-purple-600 dark:hover:to-blue-700 text-white font-medium py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          {saving ? (
+                            <div className="flex items-center gap-2">
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{
+                                  duration: 1,
+                                  repeat: Infinity,
+                                  ease: 'linear',
+                                }}
+                                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                              />
+                              {t('profile.form.changing') || 'Changing...'}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Lock className="h-4 w-4" />
+                              {t('profile.form.changePassword') ||
+                                'Change Password'}
+                            </div>
+                          )}
+                        </Button>
+                      </motion.div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

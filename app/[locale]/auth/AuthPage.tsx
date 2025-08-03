@@ -263,18 +263,7 @@ export default function AuthPage() {
 
   return (
     <PageWrapper theme={theme}>
-      {/* Full page background image */}
-      <BackgroundImage>
-        <Image
-          src={theme === 'dark' ? '/images/bg.png' : '/images/bg.png'}
-          alt="Background"
-          fill
-          style={{ objectFit: 'cover' }}
-          priority
-        />
-        <BackgroundOverlay theme={theme} />
-      </BackgroundImage>
-
+      <FloatingParticles theme={theme} />
       <div className="absolute top-0 left-0 right-0 p-6 z-10">
         {' '}
         <Link href={`/${locale}`}>
@@ -819,37 +808,502 @@ export const PageWrapper = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
+  background: ${props =>
+    props.theme === 'dark'
+      ? 'linear-gradient(135deg, #0f1419 0%, #1a237e 15%, #3949ab 30%, #5e35b1 45%, #7b1fa2 60%, #8e24aa 75%, #9c27b0 90%, #ad47d4 100%)'
+      : 'linear-gradient(135deg, #ffd54f 0%, #ffb74d 15%, #ff9800 30%, #ff5722 45%, #795548 60%, #5d4037 75%, #424242 90%, #263238 100%)'};
+  background-size: 400% 400%;
+  animation: backgroundMove 25s ease infinite;
+
+  /* Дополнительный слой анимированных узоров */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(
+        circle at 15% 30%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(94, 53, 177, 0.4)'
+              : 'rgba(255, 181, 77, 0.4)'}
+          0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 85% 20%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(156, 39, 176, 0.3)'
+              : 'rgba(255, 152, 0, 0.3)'}
+          0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 50% 80%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(173, 71, 212, 0.3)'
+              : 'rgba(121, 85, 72, 0.3)'}
+          0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 20% 90%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(57, 73, 171, 0.4)'
+              : 'rgba(66, 66, 66, 0.3)'}
+          0%,
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 70% 10%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(123, 31, 162, 0.2)'
+              : 'rgba(255, 87, 34, 0.2)'}
+          0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 90% 70%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(26, 35, 126, 0.3)'
+              : 'rgba(93, 64, 55, 0.3)'}
+          0%,
+        transparent 55%
+      ),
+      /* Добавляем движущиеся геометрические формы */
+        conic-gradient(
+          from 0deg at 25% 25%,
+          ${props =>
+              props.theme === 'dark'
+                ? 'rgba(156, 39, 176, 0.1)'
+                : 'rgba(255, 152, 0, 0.1)'}
+            0deg,
+          transparent 60deg,
+          ${props =>
+              props.theme === 'dark'
+                ? 'rgba(94, 53, 177, 0.1)'
+                : 'rgba(255, 87, 34, 0.1)'}
+            120deg,
+          transparent 180deg
+        ),
+      conic-gradient(
+        from 180deg at 75% 75%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(57, 73, 171, 0.1)'
+              : 'rgba(121, 85, 72, 0.1)'}
+          0deg,
+        transparent 90deg,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(123, 31, 162, 0.1)'
+              : 'rgba(66, 66, 66, 0.1)'}
+          180deg,
+        transparent 270deg
+      );
+    animation: float 30s ease-in-out infinite;
+  }
+
+  /* Сияющий световой эффект с пульсирующими кольцами */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      /* Основной сияющий эффект */
+      linear-gradient(
+        45deg,
+        transparent 30%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(156, 39, 176, 0.05)'
+              : 'rgba(255, 181, 77, 0.1)'}
+          50%,
+        transparent 70%
+      ),
+      /* Пульсирующие световые кольца */
+        radial-gradient(
+          circle at 20% 30%,
+          ${props =>
+              props.theme === 'dark'
+                ? 'rgba(156, 39, 176, 0.3)'
+                : 'rgba(255, 152, 0, 0.3)'}
+            20%,
+          transparent 21%,
+          transparent 30%,
+          ${props =>
+              props.theme === 'dark'
+                ? 'rgba(94, 53, 177, 0.2)'
+                : 'rgba(255, 87, 34, 0.2)'}
+            31%,
+          transparent 32%
+        ),
+      radial-gradient(
+        circle at 80% 70%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(123, 31, 162, 0.3)'
+              : 'rgba(121, 85, 72, 0.3)'}
+          15%,
+        transparent 16%,
+        transparent 25%,
+        ${props =>
+            props.theme === 'dark'
+              ? 'rgba(57, 73, 171, 0.2)'
+              : 'rgba(66, 66, 66, 0.2)'}
+          26%,
+        transparent 27%
+      );
+    animation:
+      shimmer 10s ease-in-out infinite,
+      pulse-rings 8s ease-in-out infinite;
+  }
+
+  /* Звездное небо для темной темы и солнечные блики для светлой */
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: ${props =>
+      props.theme === 'dark'
+        ? `
+          /* Звезды */
+          radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.8), transparent),
+          radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.6), transparent),
+          radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.9), transparent),
+          radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.7), transparent),
+          radial-gradient(1px 1px at 160px 30px, rgba(255, 255, 255, 0.5), transparent),
+          radial-gradient(2px 2px at 200px 60px, rgba(156, 39, 176, 0.8), transparent),
+          radial-gradient(1px 1px at 250px 90px, rgba(255, 255, 255, 0.6), transparent),
+          radial-gradient(1px 1px at 300px 20px, rgba(255, 255, 255, 0.8), transparent),
+          radial-gradient(2px 2px at 350px 70px, rgba(94, 53, 177, 0.7), transparent),
+          radial-gradient(1px 1px at 400px 40px, rgba(255, 255, 255, 0.9), transparent)
+        `
+        : `
+          /* Солнечные блики */
+          radial-gradient(3px 3px at 20px 30px, rgba(255, 255, 255, 0.9), transparent),
+          radial-gradient(2px 2px at 60px 70px, rgba(255, 215, 77, 0.8), transparent),
+          radial-gradient(4px 4px at 120px 40px, rgba(255, 255, 255, 0.7), transparent),
+          radial-gradient(2px 2px at 180px 80px, rgba(255, 183, 77, 0.6), transparent),
+          radial-gradient(3px 3px at 240px 30px, rgba(255, 255, 255, 0.8), transparent),
+          radial-gradient(2px 2px at 300px 60px, rgba(255, 152, 0, 0.7), transparent),
+          radial-gradient(4px 4px at 360px 90px, rgba(255, 255, 255, 0.5), transparent),
+          radial-gradient(2px 2px at 420px 20px, rgba(255, 87, 34, 0.6), transparent),
+          radial-gradient(3px 3px at 480px 70px, rgba(255, 255, 255, 0.8), transparent),
+          radial-gradient(2px 2px at 540px 40px, rgba(255, 152, 0, 0.7), transparent)
+        `};
+    background-size:
+      600px 400px,
+      500px 300px,
+      700px 500px;
+    animation: ${props =>
+      props.theme === 'dark'
+        ? 'twinkle 4s linear infinite'
+        : 'sparkle 6s ease-in-out infinite'};
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes sparkle {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    25% {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    75% {
+      opacity: 0.6;
+      transform: scale(1.15);
+    }
+  }
+
+  @keyframes backgroundMove {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 0%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      opacity: 0.6;
+      transform: translate(0px, 0px) scale(1) rotate(0deg);
+    }
+    25% {
+      opacity: 0.8;
+      transform: translate(30px, -30px) scale(1.1) rotate(5deg);
+    }
+    50% {
+      opacity: 0.9;
+      transform: translate(-10px, -40px) scale(1.05) rotate(-3deg);
+    }
+    75% {
+      opacity: 0.7;
+      transform: translate(-20px, 20px) scale(0.9) rotate(8deg);
+    }
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      transform: translateX(-100%) skewX(-15deg);
+      opacity: 0;
+    }
+    25% {
+      transform: translateX(-50%) skewX(-10deg);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateX(0%) skewX(-5deg);
+      opacity: 1;
+    }
+    75% {
+      transform: translateX(50%) skewX(-10deg);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateX(100%) skewX(-15deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-rings {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    25% {
+      transform: scale(1.1);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    75% {
+      transform: scale(1.05);
+      opacity: 0.7;
+    }
+  }
+
+  /* Добавляем плавающие частицы */
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: ${props =>
+      Array.from({ length: 12 }, (_, i) => {
+        const x = Math.floor(Math.random() * 100);
+        const y = Math.floor(Math.random() * 100);
+        const size = Math.floor(Math.random() * 3) + 1;
+        return `radial-gradient(circle at ${x}% ${y}%, ${
+          props.theme === 'dark'
+            ? `rgba(${156 + Math.floor(Math.random() * 50)}, ${39 + Math.floor(Math.random() * 30)}, ${176 + Math.floor(Math.random() * 50)}, 0.${Math.floor(Math.random() * 3) + 1})`
+            : `rgba(${255}, ${152 + Math.floor(Math.random() * 50)}, ${Math.floor(Math.random() * 100)}, 0.${Math.floor(Math.random() * 3) + 1})`
+        } 0%, transparent ${size}px)`;
+      }).join(', ')};
+    animation: particles 40s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes particles {
+    0% {
+      transform: translateY(0px) rotate(0deg);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-50px) rotate(180deg);
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
 `;
 
 export const BackgroundImage = styled.div`
   position: fixed;
   inset: 0;
   z-index: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+            radial-gradient(circle at 25% 25%, rgba(94, 53, 177, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(26, 35, 126, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.08) 0%, transparent 60%),
+            linear-gradient(45deg, rgba(57, 73, 171, 0.1) 0%, rgba(123, 31, 162, 0.08) 100%)
+          `
+        : `
+            radial-gradient(circle at 25% 25%, rgba(255, 181, 77, 0.2) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(93, 64, 55, 0.18) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(255, 152, 0, 0.12) 0%, transparent 60%),
+            linear-gradient(45deg, rgba(255, 87, 34, 0.15) 0%, rgba(66, 66, 66, 0.2) 100%)
+          `};
+    animation: gradientShift 15s ease-in-out infinite;
+  }
+
+  @keyframes gradientShift {
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
 `;
 
 export const BackgroundOverlay = styled.div`
   position: absolute;
   inset: 0;
   background: ${props =>
-    props.theme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.3)'};
+    props.theme === 'dark' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.2)'};
+  backdrop-filter: blur(1px);
 `;
 
 export const Container = styled.div`
-  background-color: ${props => (props.theme === 'dark' ? '#1c1c1e' : '#fff')};
-  border-radius: 10px;
-  box-shadow:
-    0 14px 28px
-      ${props =>
-        props.theme === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.25)'},
-    0 10px 10px
-      ${props =>
-        props.theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.22)'};
+  background: ${props =>
+    props.theme === 'dark'
+      ? 'linear-gradient(145deg, rgba(15, 15, 20, 0.95) 0%, rgba(25, 25, 35, 0.92) 50%, rgba(35, 25, 45, 0.9) 100%)'
+      : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.92) 50%, rgba(240, 245, 251, 0.9) 100%)'};
+  backdrop-filter: blur(25px);
+  border: 1px solid
+    ${props =>
+      props.theme === 'dark'
+        ? 'rgba(156, 39, 176, 0.25)'
+        : 'rgba(255, 181, 77, 0.3)'};
+  border-radius: 25px;
+  box-shadow: ${props =>
+    props.theme === 'dark'
+      ? `
+          0 35px 80px rgba(0, 0, 0, 0.7),
+          0 15px 30px rgba(94, 53, 177, 0.3),
+          0 0 0 1px rgba(156, 39, 176, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+        `
+      : `
+          0 35px 80px rgba(0, 0, 0, 0.2),
+          0 15px 30px rgba(255, 152, 0, 0.2),
+          0 0 0 1px rgba(255, 181, 77, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+        `};
   position: relative;
   overflow: hidden;
   width: 1100px;
   max-width: 95%;
   min-height: 750px;
   z-index: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+          radial-gradient(circle at 30% 20%, rgba(94, 53, 177, 0.12) 0%, transparent 50%),
+          radial-gradient(circle at 70% 80%, rgba(156, 39, 176, 0.08) 0%, transparent 50%),
+          linear-gradient(135deg, rgba(123, 31, 162, 0.06) 0%, rgba(57, 73, 171, 0.08) 100%)
+        `
+        : `
+          radial-gradient(circle at 30% 20%, rgba(255, 181, 77, 0.12) 0%, transparent 50%),
+          radial-gradient(circle at 70% 80%, rgba(255, 152, 0, 0.08) 0%, transparent 50%),
+          linear-gradient(135deg, rgba(255, 87, 34, 0.06) 0%, rgba(66, 66, 66, 0.08) 100%)
+        `};
+    border-radius: 25px;
+    pointer-events: none;
+    animation: innerGlow 12s ease-in-out infinite;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: ${props =>
+      props.theme === 'dark'
+        ? 'linear-gradient(45deg, rgba(94, 53, 177, 0.4), rgba(156, 39, 176, 0.4), rgba(123, 31, 162, 0.4), rgba(57, 73, 171, 0.4))'
+        : 'linear-gradient(45deg, rgba(255, 181, 77, 0.4), rgba(255, 152, 0, 0.4), rgba(255, 87, 34, 0.4), rgba(66, 66, 66, 0.4))'};
+    border-radius: 27px;
+    z-index: -1;
+    opacity: 0;
+    animation: borderGlow 8s ease-in-out infinite;
+  }
+
+  @keyframes innerGlow {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes borderGlow {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
 
   &.right-panel-active .sign-in-container {
     transform: translateX(100%);
@@ -903,6 +1357,7 @@ export const Container = styled.div`
   @media (max-width: 768px) {
     width: 100%;
     min-height: 100vh;
+    border-radius: 0;
   }
 `;
 
@@ -935,8 +1390,11 @@ export const SignUpContainer = styled(FormContainer)`
 `;
 
 export const Form = styled.form`
-  background-color: ${props =>
-    props.theme === 'dark' ? '#1a1a1a' : '#FFFFFF'};
+  background: ${props =>
+    props.theme === 'dark'
+      ? 'linear-gradient(145deg, rgba(20, 20, 25, 0.85) 0%, rgba(30, 30, 40, 0.7) 50%, rgba(25, 20, 35, 0.8) 100%)'
+      : 'linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 50%, rgba(245, 247, 250, 0.85) 100%)'};
+  backdrop-filter: blur(15px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -944,6 +1402,40 @@ export const Form = styled.form`
   padding: 40px 60px;
   height: 100%;
   text-align: center;
+  border-radius: 25px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+          radial-gradient(circle at 20% 30%, rgba(94, 53, 177, 0.08) 0%, transparent 60%),
+          radial-gradient(circle at 80% 70%, rgba(156, 39, 176, 0.06) 0%, transparent 60%)
+        `
+        : `
+          radial-gradient(circle at 20% 30%, rgba(255, 181, 77, 0.08) 0%, transparent 60%),
+          radial-gradient(circle at 80% 70%, rgba(255, 152, 0, 0.06) 0%, transparent 60%)
+        `};
+    pointer-events: none;
+    animation: formGlow 10s ease-in-out infinite;
+  }
+
+  @keyframes formGlow {
+    0%,
+    100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
 
   @media (max-width: 768px) {
     padding: 20px;
@@ -953,7 +1445,19 @@ export const Form = styled.form`
 export const Title = styled.h1`
   font-weight: bold;
   margin: 0 0 20px 0;
-  color: ${props => (props.theme === 'dark' ? '#fff' : '#000')};
+  color: ${props => (props.theme === 'dark' ? '#ffffff' : '#1f2937')};
+  background: ${props =>
+    props.theme === 'dark'
+      ? 'linear-gradient(135deg, #e1bee7 0%, #ba68c8 50%, #9c27b0 100%)'
+      : 'linear-gradient(135deg, #ffb74d 0%, #ff9800 50%, #5d4037 100%)'};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2rem;
+  text-shadow: ${props =>
+    props.theme === 'dark'
+      ? '0 0 20px rgba(156, 39, 176, 0.3)'
+      : '0 0 20px rgba(255, 152, 0, 0.2)'};
 `;
 
 export const FormGrid = styled.div`
@@ -1068,11 +1572,28 @@ export const OverlayContainer = styled.div`
 export const Overlay = styled.div`
   background: ${props =>
     props.theme === 'dark'
-      ? 'linear-gradient(to right, #dc2626, #ef4444)'
-      : 'linear-gradient(to right, #0066CC, #3b82f6)'};
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 0 0;
+      ? `
+        linear-gradient(135deg, 
+          rgba(26, 35, 126, 0.9) 0%, 
+          rgba(57, 73, 171, 0.9) 20%, 
+          rgba(94, 53, 177, 0.9) 40%, 
+          rgba(123, 31, 162, 0.9) 60%, 
+          rgba(142, 36, 170, 0.9) 80%, 
+          rgba(156, 39, 176, 0.9) 100%
+        )
+      `
+      : `
+        linear-gradient(135deg, 
+          rgba(255, 213, 79, 0.9) 0%, 
+          rgba(255, 183, 77, 0.9) 20%, 
+          rgba(255, 152, 0, 0.9) 40%, 
+          rgba(255, 87, 34, 0.9) 60%, 
+          rgba(121, 85, 72, 0.9) 80%, 
+          rgba(66, 66, 66, 0.9) 100%
+        )
+      `};
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
   color: #ffffff;
   position: relative;
   left: -100%;
@@ -1080,6 +1601,48 @@ export const Overlay = styled.div`
   width: 200%;
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 70% 70%,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 50%
+      );
+    animation: overlayFloat 20s ease-in-out infinite;
+  }
+
+  @keyframes gradientAnimation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes overlayFloat {
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.05);
+    }
+  }
 `;
 
 export const OverlayPanel = styled.div`
@@ -1138,23 +1701,62 @@ export const StyledInput = styled.div`
     outline: none;
     border-radius: 15px;
     padding: 1.1em;
-    background-color: ${props =>
-      props.theme === 'dark' ? '#2d2d2d' : '#f3f4f6'};
-    box-shadow: inset 2px 5px 10px rgba(0, 0, 0, 0.3);
-    transition: 300ms ease-in-out;
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+          linear-gradient(145deg, rgba(45, 45, 45, 0.8) 0%, rgba(60, 60, 60, 0.6) 100%)
+        `
+        : `
+          linear-gradient(145deg, rgba(243, 244, 246, 0.9) 0%, rgba(249, 250, 251, 0.7) 100%)
+        `};
+    backdrop-filter: blur(10px);
+    border: 1px solid
+      ${props =>
+        props.theme === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.05)'};
+    box-shadow: ${props =>
+      props.theme === 'dark'
+        ? `
+          inset 2px 5px 10px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.05)
+        `
+        : `
+          inset 2px 5px 10px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.5)
+        `};
+    transition: all 300ms ease-in-out;
     width: 100%;
     font-size: 14px;
-    color: ${props => (props.theme === 'dark' ? '#fff' : '#000')};
+    color: ${props => (props.theme === 'dark' ? '#ffffff' : '#1f2937')};
   }
 
   .input:focus {
-    background-color: ${props =>
-      props.theme === 'dark' ? '#1a1a1a' : '#ffffff'};
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+          linear-gradient(145deg, rgba(26, 26, 26, 0.9) 0%, rgba(40, 40, 40, 0.7) 100%)
+        `
+        : `
+          linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.8) 100%)
+        `};
     transform: scale(1.02);
+    border-color: ${props =>
+      props.theme === 'dark'
+        ? 'rgba(156, 39, 176, 0.6)'
+        : 'rgba(255, 152, 0, 0.6)'};
     box-shadow: ${props =>
       props.theme === 'dark'
-        ? '13px 13px 100px rgba(239, 68, 68, 0.2), -13px -13px 100px rgba(0, 0, 0, 0.5)'
-        : '13px 13px 100px rgba(0, 102, 204, 0.1), -13px -13px 100px #ffffff'};
+        ? `
+          0 0 20px rgba(156, 39, 176, 0.3),
+          inset 2px 5px 10px rgba(0, 0, 0, 0.2),
+          0 0 0 1px rgba(156, 39, 176, 0.4)
+        `
+        : `
+          0 0 20px rgba(255, 152, 0, 0.2),
+          inset 2px 5px 10px rgba(0, 0, 0, 0.05),
+          0 0 0 1px rgba(255, 152, 0, 0.4)
+        `};
   }
 
   .input::placeholder {
@@ -1169,18 +1771,29 @@ export const StyledButton = styled.div`
     display: flex;
     width: 170px;
     height: fit-content;
-    background:
-      radial-gradient(
-        65.28% 65.28% at 50% 100%,
-        rgba(223, 113, 255, 0.8) 0%,
-        rgba(223, 113, 255, 0) 100%
-      ),
-      linear-gradient(121deg, #d40b11, #5e44c7, #179aeb);
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+          radial-gradient(
+            65.28% 65.28% at 50% 100%,
+            rgba(156, 39, 176, 0.8) 0%,
+            rgba(156, 39, 176, 0) 100%
+          ),
+          linear-gradient(121deg, #1a237e, #5e35b1, #9c27b0)
+        `
+        : `
+          radial-gradient(
+            65.28% 65.28% at 50% 100%,
+            rgba(255, 152, 0, 0.8) 0%,
+            rgba(255, 152, 0, 0) 100%
+          ),
+          linear-gradient(121deg, #ffd54f, #ff9800, #5d4037)
+        `};
     border-radius: 40px;
     box-shadow: ${props =>
       props.theme === 'dark'
-        ? '0px 5px 10px rgba(239, 68, 68, 0.3)'
-        : '0px 5px 10px rgba(0, 102, 204, 0.3)'};
+        ? '0px 5px 10px rgba(156, 39, 176, 0.4)'
+        : '0px 5px 10px rgba(255, 152, 0, 0.4)'};
     justify-content: space-between;
     align-items: center;
     border: none;
@@ -1189,13 +1802,24 @@ export const StyledButton = styled.div`
   }
 
   .Btn-Container:hover {
-    background:
-      radial-gradient(
-        65.28% 65.28% at 50% 100%,
-        rgba(223, 113, 255, 0.8) 0%,
-        rgba(223, 113, 255, 0) 100%
-      ),
-      linear-gradient(121deg, #d40b11, #5e44c7, #179aeb);
+    background: ${props =>
+      props.theme === 'dark'
+        ? `
+          radial-gradient(
+            65.28% 65.28% at 50% 100%,
+            rgba(156, 39, 176, 0.9) 0%,
+            rgba(156, 39, 176, 0) 100%
+          ),
+          linear-gradient(121deg, #3949ab, #7b1fa2, #ad47d4)
+        `
+        : `
+          radial-gradient(
+            65.28% 65.28% at 50% 100%,
+            rgba(255, 152, 0, 0.9) 0%,
+            rgba(255, 152, 0, 0) 100%
+          ),
+          linear-gradient(121deg, #ffb74d, #ff5722, #424242)
+        `};
     transform: translateY(-2px);
   }
 
@@ -1324,5 +1948,68 @@ export const TermsLink = styled(Link)`
 
   &:hover {
     color: ${props => (props.theme === 'dark' ? '#93c5fd' : '#1d4ed8')};
+  }
+`;
+
+// Компонент анимированных частиц
+const FloatingParticles = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: ${props =>
+      props.theme === 'dark'
+        ? 'rgba(156, 39, 176, 0.6)'
+        : 'rgba(255, 152, 0, 0.6)'};
+    animation: float-particle 12s linear infinite;
+  }
+
+  &::before {
+    top: 10%;
+    left: 20%;
+    animation-delay: -2s;
+    animation-duration: 15s;
+  }
+
+  &::after {
+    top: 60%;
+    right: 25%;
+    animation-delay: -8s;
+    animation-duration: 18s;
+    background: ${props =>
+      props.theme === 'dark'
+        ? 'rgba(94, 53, 177, 0.5)'
+        : 'rgba(255, 87, 34, 0.5)'};
+  }
+
+  @keyframes float-particle {
+    0% {
+      transform: translateY(100vh) translateX(0px) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(90vh) translateX(20px) scale(1);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(-10vh) translateX(-20px) scale(0.8);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20vh) translateX(0px) scale(0);
+    }
   }
 `;

@@ -6,20 +6,23 @@ import {
   Film,
   Heart,
   Github,
-  Twitter,
   Mail,
   Star,
   Play,
   Users,
   Sparkles,
   ArrowUp,
+  Loader2,
+  Tv,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useStats } from '@/app/hooks/useStats';
 
 export default function Footer() {
   const t = useTranslations();
   const currentYear = new Date().getFullYear();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const { stats, loading: statsLoading } = useStats();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,46 +51,70 @@ export default function Footer() {
         <div className="h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent dark:via-purple-400"></div>
 
         <div className="container mx-auto px-4 py-16">
+          {' '}
           {/* Stats Section */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 text-center">
             <div className="group">
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
                 <Film className="w-8 h-8 text-amber-400 dark:text-purple-400 mx-auto mb-2 group-hover:animate-bounce" />
-                <div className="text-2xl font-bold text-white">10K+</div>
+                <div className="text-2xl font-bold text-white flex items-center justify-center">
+                  {statsLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    stats?.movies || '10к+'
+                  )}
+                </div>
                 <div className="text-sm text-gray-300">
-                  {t('footer.stats.movies') || 'Movies'}
+                  {t('footer.stats.movies') || 'Фильмов'}
+                </div>
+              </div>
+            </div>
+            <div className="group">
+              <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                <Tv className="w-8 h-8 text-amber-400 dark:text-purple-400 mx-auto mb-2 group-hover:animate-bounce" />
+                <div className="text-2xl font-bold text-white flex items-center justify-center">
+                  {statsLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    stats?.tvSeries || '5к+'
+                  )}
+                </div>
+                <div className="text-sm text-gray-300">
+                  {t('footer.stats.tvSeries') || 'Сериалов'}
                 </div>
               </div>
             </div>
             <div className="group">
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
                 <Users className="w-8 h-8 text-amber-400 dark:text-purple-400 mx-auto mb-2 group-hover:animate-bounce" />
-                <div className="text-2xl font-bold text-white">5K+</div>
+                <div className="text-2xl font-bold text-white flex items-center justify-center">
+                  {statsLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    stats?.users || '3к+'
+                  )}
+                </div>
                 <div className="text-sm text-gray-300">
-                  {t('footer.stats.users') || 'Users'}
+                  {t('footer.stats.users') || 'Пользователей'}
                 </div>
               </div>
             </div>
             <div className="group">
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
                 <Star className="w-8 h-8 text-amber-400 dark:text-purple-400 mx-auto mb-2 group-hover:animate-bounce" />
-                <div className="text-2xl font-bold text-white">50K+</div>
-                <div className="text-sm text-gray-300">
-                  {t('footer.stats.reviews') || 'Reviews'}
+                <div className="text-2xl font-bold text-white flex items-center justify-center">
+                  {statsLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    stats?.hours || '50к+'
+                  )}
                 </div>
-              </div>
-            </div>
-            <div className="group">
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
-                <Play className="w-8 h-8 text-amber-400 dark:text-purple-400 mx-auto mb-2 group-hover:animate-bounce" />
-                <div className="text-2xl font-bold text-white">100K+</div>
                 <div className="text-sm text-gray-300">
-                  {t('footer.stats.hours') || 'Hours Watched'}
+                  {t('footer.stats.hours') || 'Часов просмотра'}
                 </div>
               </div>
             </div>
           </div>
-
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             {/* Brand Section */}
@@ -98,7 +125,7 @@ export default function Footer() {
                   <Sparkles className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1 animate-pulse" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-300 dark:from-purple-400 dark:to-pink-300 bg-clip-text text-transparent">
-                  Movie List
+                  Nikrol
                 </span>
               </div>
               <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
@@ -107,24 +134,17 @@ export default function Footer() {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://github.com/21DP4RKaln"
                   className="group relative p-3 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-110"
                 >
                   <Github className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 dark:from-purple-400/20 dark:to-pink-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </a>
                 <a
-                  href="#"
+                  href="sitvain89@gmail.com"
                   className="group relative p-3 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-110"
                 >
                   <Mail className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 dark:from-purple-400/20 dark:to-pink-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </a>
-                <a
-                  href="#"
-                  className="group relative p-3 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 hover:border-amber-400/50 dark:hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-110"
-                >
-                  <Twitter className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-yellow-400/20 dark:from-purple-400/20 dark:to-pink-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </a>
               </div>
@@ -157,13 +177,11 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/dashboard"
+                    href="/list"
                     className="group flex items-center space-x-2 text-gray-300 hover:text-white transition-all duration-300 hover:translate-x-1"
                   >
                     <div className="w-2 h-2 bg-amber-400/50 dark:bg-purple-400/50 rounded-full group-hover:bg-amber-400 dark:group-hover:bg-purple-400 transition-colors"></div>
-                    <span>
-                      {t('footer.navigation.dashboard') || 'Dashboard'}
-                    </span>
+                    <span>{t('footer.navigation.list') || 'List'}</span>
                   </Link>
                 </li>
                 <li>
@@ -264,32 +282,6 @@ export default function Footer() {
               </ul>
             </div>
           </div>
-
-          {/* Newsletter Section */}
-          <div className="mb-12">
-            <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 dark:from-purple-500/10 dark:to-pink-500/10 backdrop-blur-sm rounded-3xl border border-white/10 p-8 text-center">
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-amber-400 to-yellow-300 dark:from-purple-400 dark:to-pink-300 bg-clip-text text-transparent">
-                {t('footer.newsletter.title') || 'Stay Updated'}
-              </h3>
-              <p className="text-gray-300 mb-6 max-w-md mx-auto">
-                {t('footer.newsletter.description') ||
-                  'Get the latest movie recommendations and updates delivered to your inbox.'}
-              </p>
-              <div className="flex max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder={
-                    t('footer.newsletter.placeholder') || 'Enter your email'
-                  }
-                  className="flex-1 px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-l-xl text-white placeholder-gray-400 focus:outline-none focus:border-amber-400 dark:focus:border-purple-400 transition-colors"
-                />
-                <button className="px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 dark:from-purple-500 dark:to-pink-500 text-white font-medium rounded-r-xl hover:from-amber-600 hover:to-yellow-600 dark:hover:from-purple-600 dark:hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
-                  {t('footer.newsletter.subscribe') || 'Subscribe'}
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* Bottom Bar */}
           <div className="border-t border-white/10 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
@@ -297,14 +289,13 @@ export default function Footer() {
                 <p className="flex items-center space-x-2">
                   <span>
                     {t('footer.copyright', { year: currentYear }) ||
-                      `© ${currentYear} Movie List. All rights reserved.`}
+                      `© ${currentYear} SVN. All rights reserved.`}
                   </span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-400">
                 <span>{t('footer.madeWith') || 'Made with'}</span>
                 <Heart className="w-4 h-4 text-red-500 animate-pulse" />
-                <span>{t('footer.forMovieLovers') || 'for movie lovers'}</span>
               </div>
             </div>
           </div>

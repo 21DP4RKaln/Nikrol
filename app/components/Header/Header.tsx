@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Button } from '@/app/components/ui/button';
 import {
@@ -25,42 +26,73 @@ export default function Header() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const currentLocale = useLocale();
+  const t = useTranslations('header');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWatchDropdownOpen, setIsWatchDropdownOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
+  const [logoSrc, setLogoSrc] = useState('/images/light-logo.png');
 
   const watchDropdownRef = useRef<HTMLDivElement>(null);
   const languageDropdownRef = useRef<HTMLDivElement>(null);
   const themeDropdownRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
 
+  // Обновляем логотип при изменении темы
+  useEffect(() => {
+    const updateLogo = () => {
+      if (theme === 'dark') {
+        setLogoSrc('/images/dark-logo.png');
+      } else if (theme === 'light') {
+        setLogoSrc('/images/light-logo.png');
+      } else {
+        // system theme - используем media query для определения предпочтений
+        const isDark = window.matchMedia(
+          '(prefers-color-scheme: dark)'
+        ).matches;
+        setLogoSrc(isDark ? '/images/dark-logo.png' : '/images/light-logo.png');
+      }
+    };
+
+    // Обновляем логотип сразу
+    updateLogo();
+
+    // Для system theme добавляем слушатель изменений темы системы
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => updateLogo();
+      mediaQuery.addEventListener('change', handleChange);
+
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [theme]);
+
   const handleLogout = async () => {
     const { signOut } = await import('next-auth/react');
     await signOut({ callbackUrl: '/' });
   };
-
   const handleLanguageChange = (locale: string) => {
-    const currentPath = pathname.replace(/^\/[a-z]{2}/, '');
-    router.push(`/${locale}${currentPath}`);
+    // Получаем текущий путь без локали
+    const currentPath = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
+    const newPath =
+      currentPath === '/' ? `/${locale}` : `/${locale}${currentPath}`;
+
+    router.push(newPath);
     setIsLanguageDropdownOpen(false);
   };
-
   const getCurrentLocale = () => {
-    const locale = pathname.split('/')[1];
-    return ['en', 'lv', 'ru'].includes(locale) ? locale : 'en';
+    return currentLocale || 'en';
   };
-
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'en', name: 'English', flag: '🇬🇧' },
     { code: 'lv', name: 'Latviešu', flag: '🇱🇻' },
     { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   ];
-
   const themes = [
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
-    { value: 'system', label: 'System', icon: Monitor },
+    { value: 'light', label: t('settings.themes.light'), icon: Sun },
+    { value: 'dark', label: t('settings.themes.dark'), icon: Moon },
+    { value: 'system', label: t('settings.themes.system'), icon: Monitor },
   ];
 
   // Close dropdowns when clicking outside
@@ -85,25 +117,11 @@ export default function Header() {
         setIsThemeDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  const getLogoSrc = () => {
-    if (theme === 'dark') {
-      return '/images/dark-logo.png';
-    } else if (theme === 'light') {
-      return '/images/light-logo.png';
-    } else {
-      // system theme - use media query to detect preference
-      return typeof window !== 'undefined' &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? '/images/dark-logo.png'
-        : '/images/light-logo.png';
-    }
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-50/90 via-orange-50/90 to-red-50/90 dark:from-slate-900/90 dark:via-blue-900/90 dark:to-purple-900/90 border-b border-amber-200/50 dark:border-purple-600/50 z-50 backdrop-blur-lg shadow-lg">
@@ -116,12 +134,16 @@ export default function Header() {
 
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between h-16">
+          {' '}
           {/* Enhanced Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
+          <Link
+            href={`/${currentLocale}`}
+            className="flex items-center space-x-3 group"
+          >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>{' '}
               <img
-                src={getLogoSrc()}
+                src={logoSrc}
                 alt="Movie List Logo"
                 className="relative w-10 h-10 rounded-full border-2 border-white/20 group-hover:scale-110 transition-transform duration-300"
               />
@@ -135,14 +157,6 @@ export default function Header() {
           </Link>{' '}
           {/* Enhanced Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/"
-              className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
-            >
-              <span className="relative z-10">Home</span>
-              <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-            </Link>
-
             {/* Enhanced Watch Dropdown */}
             <div className="relative" ref={watchDropdownRef}>
               <button
@@ -159,57 +173,67 @@ export default function Header() {
 
               {isWatchDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-52 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl shadow-2xl border border-amber-200/50 dark:border-purple-700/50 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+                  {' '}
                   <Link
-                    href="/movies"
+                    href={`/${currentLocale}/movies`}
                     className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 transition-all duration-200 group"
                     onClick={() => setIsWatchDropdownOpen(false)}
                   >
+                    {' '}
                     <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
                       <Film className="w-4 h-4 text-amber-600 dark:text-purple-400" />
                     </div>
-                    <span className="font-medium">Movies</span>
-                  </Link>
+                    <span className="font-medium">
+                      {t('navigation.movies')}
+                    </span>
+                  </Link>{' '}
                   <Link
-                    href="/series"
+                    href={`/${currentLocale}/series`}
                     className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 transition-all duration-200 group"
                     onClick={() => setIsWatchDropdownOpen(false)}
                   >
+                    {' '}
                     <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
                       <Tv className="w-4 h-4 text-amber-600 dark:text-purple-400" />
                     </div>
-                    <span className="font-medium">TV Series</span>
+                    <span className="font-medium">
+                      {t('navigation.tvSeries')}
+                    </span>
                   </Link>
                 </div>
               )}
-            </div>
-
-            <Link
-              href="/about"
-              className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
-            >
-              <span className="relative z-10">About</span>
-              <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-            </Link>
-
+            </div>{' '}
             {session && (
               <>
+                {' '}
                 <Link
-                  href="/dashboard"
+                  href={`/${currentLocale}/list`}
                   className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
                 >
-                  <span className="relative z-10">Dashboard</span>
+                  <span className="relative z-10">{t('navigation.list')}</span>
                   <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Link>
                 <Link
-                  href="/friends"
+                  href={`/${currentLocale}/friends`}
                   className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
                 >
-                  <span className="relative z-10">Friends</span>
+                  <span className="relative z-10">
+                    {t('navigation.friends')}
+                  </span>
                   <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Link>
               </>
-            )}
-
+            )}{' '}
+            <Link
+              href={`/${currentLocale}/about`}
+              className="relative text-gray-700 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 group"
+            >
+              <span className="relative z-10">{t('navigation.about')}</span>
+              <div className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </Link>
+          </nav>{' '}
+          {/* Enhanced Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             {/* Enhanced Language Dropdown */}
             <div className="relative" ref={languageDropdownRef}>
               <button
@@ -298,21 +322,21 @@ export default function Header() {
                 </div>
               )}
             </div>
-          </nav>{' '}
-          {/* Enhanced Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+
             {status === 'loading' ? (
               <div className="w-8 h-8 animate-spin rounded-full border-3 border-gradient-to-r from-amber-600 to-orange-600 dark:from-purple-400 dark:to-blue-400 border-t-transparent"></div>
             ) : session ? (
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3 px-3 py-2 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50">
-                  <div className="p-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500">
-                    <User className="w-4 h-4 text-white" />
+                <Link href={`/${currentLocale}/dashboard`}>
+                  <div className="flex items-center space-x-3 px-3 py-2 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50 hover:from-amber-100 hover:to-orange-100 dark:hover:from-purple-800/40 dark:hover:to-blue-800/40 transition-all duration-300 cursor-pointer group">
+                    <div className="p-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500 group-hover:scale-110 transition-transform">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      {session.user?.name}
+                    </span>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    {session.user?.name}
-                  </span>
-                </div>
+                </Link>{' '}
                 <Button
                   variant="outline"
                   size="sm"
@@ -320,26 +344,19 @@ export default function Header() {
                   className="flex items-center space-x-2 border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 hover:scale-105"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
+                  <span>{t('auth.logout')}</span>
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Link href="/auth/login">
+                {' '}
+                <Link href={`/${currentLocale}/auth/login`}>
                   <Button
                     variant="outline"
                     size="sm"
                     className="border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 hover:scale-105"
                   >
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/auth/login">
-                  <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white dark:from-purple-600 dark:to-blue-600 dark:hover:from-purple-700 dark:hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  >
-                    Sign Up
+                    {t('auth.login')}
                   </Button>
                 </Link>
               </div>
@@ -361,78 +378,94 @@ export default function Header() {
         {/* Enhanced Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-6 border-t border-amber-200/50 dark:border-purple-600/50 bg-gradient-to-r from-white/90 to-amber-50/90 dark:from-gray-900/90 dark:to-purple-900/90 backdrop-blur-lg rounded-b-xl mt-2 mx-4 shadow-xl">
+            {' '}
             <nav className="flex flex-col space-y-4">
+              {' '}
               <Link
-                href="/"
+                href={`/${currentLocale}`}
                 className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                🏠 Home
+                🏠 {t('navigation.home')}
               </Link>
-
               {/* Enhanced Mobile Watch Section */}
               <div className="space-y-3 px-2">
+                {' '}
                 <span className="text-gray-800 dark:text-gray-200 font-bold text-lg flex items-center space-x-2">
                   <Play className="w-5 h-5 text-amber-600 dark:text-purple-400" />
-                  <span>Watch</span>
+                  <span>{t('navigation.watch')}</span>
                 </span>
                 <div className="ml-4 space-y-2">
+                  {' '}
                   <Link
-                    href="/movies"
+                    href={`/${currentLocale}/movies`}
                     className="flex items-center space-x-3 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
+                    {' '}
                     <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
                       <Film className="w-4 h-4" />
                     </div>
-                    <span className="font-medium">Movies</span>
-                  </Link>
+                    <span className="font-medium">
+                      {t('navigation.movies')}
+                    </span>
+                  </Link>{' '}
                   <Link
-                    href="/series"
+                    href={`/${currentLocale}/series`}
                     className="flex items-center space-x-3 text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 group"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <div className="p-1 rounded-lg bg-gradient-to-r from-amber-400/20 to-orange-500/20 dark:from-purple-400/20 dark:to-blue-500/20 group-hover:scale-110 transition-transform duration-200">
                       <Tv className="w-4 h-4" />
                     </div>
-                    <span className="font-medium">TV Series</span>
+                    <span className="font-medium">
+                      {t('navigation.tvSeries')}
+                    </span>
                   </Link>
                 </div>
-              </div>
-
+              </div>{' '}
+              {session && (
+                <>
+                  {' '}
+                  <Link
+                    href={`/${currentLocale}/dashboard`}
+                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    👤 {t('auth.myProfile')}
+                  </Link>{' '}
+                  <Link
+                    href={`/${currentLocale}/list`}
+                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    📊 {t('navigation.list')}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/friends`}
+                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    👥 {t('navigation.friends')}
+                  </Link>
+                </>
+              )}{' '}
               <Link
-                href="/about"
+                href={`/${currentLocale}/about`}
                 className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                ℹ️ About
+                ℹ️ {t('navigation.about')}
               </Link>
-              {session && (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    📊 Dashboard
-                  </Link>
-                  <Link
-                    href="/friends"
-                    className="text-gray-600 hover:text-amber-600 dark:text-gray-300 dark:hover:text-purple-400 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-purple-900/30 dark:hover:to-blue-900/30 font-medium"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    👥 Friends
-                  </Link>
-                </>
-              )}
-
               {/* Enhanced Mobile Language Section */}
               <div className="space-y-3 pt-4 px-2 border-t border-amber-200/50 dark:border-purple-600/50">
+                {' '}
                 <span className="text-gray-800 dark:text-gray-200 font-bold text-lg flex items-center space-x-2">
                   <Globe className="w-5 h-5 text-amber-600 dark:text-purple-400" />
-                  <span>Language</span>
+                  <span>{t('settings.language')}</span>
                 </span>
                 <div className="ml-4 space-y-2">
+                  {' '}
                   {languages.map(lang => (
                     <button
                       key={lang.code}
@@ -452,7 +485,6 @@ export default function Header() {
                   ))}
                 </div>
               </div>
-
               {/* Enhanced Mobile Theme Section */}
               <div className="space-y-3 pt-4 px-2 border-t border-amber-200/50 dark:border-purple-600/50">
                 <span className="text-gray-800 dark:text-gray-200 font-bold text-lg flex items-center space-x-2">
@@ -465,7 +497,7 @@ export default function Header() {
                   {theme === 'system' && (
                     <Monitor className="w-5 h-5 text-amber-600 dark:text-purple-400" />
                   )}
-                  <span>Theme</span>
+                  <span>{t('settings.theme')}</span>
                 </span>
                 <div className="ml-4 space-y-2">
                   {themes.map(themeOption => {
@@ -492,19 +524,29 @@ export default function Header() {
                   })}
                 </div>
               </div>
-
-              {/* Enhanced Mobile Auth Section */}
+              {/* Enhanced Mobile Auth Section */}{' '}
               <div className="pt-4 px-2 border-t border-amber-200/50 dark:border-purple-600/50">
                 {session ? (
                   <div className="space-y-4">
-                    <div className="flex items-center space-x-3 py-3 px-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50">
-                      <div className="p-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500">
-                        <User className="w-4 h-4 text-white" />
+                    {' '}
+                    <Link
+                      href={`/${currentLocale}/dashboard`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <div className="flex items-center space-x-3 py-3 px-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-amber-200/50 dark:border-purple-600/50 hover:from-amber-100 hover:to-orange-100 dark:hover:from-purple-800/40 dark:hover:to-blue-800/40 transition-all duration-300 cursor-pointer">
+                        <div className="p-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 dark:from-purple-400 dark:to-blue-500">
+                          <User className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-700 dark:text-gray-300 font-medium block">
+                            {session.user?.name}
+                          </span>{' '}
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {t('auth.goToProfile')}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                        {session.user?.name}
-                      </span>
-                    </div>
+                    </Link>{' '}
                     <Button
                       variant="outline"
                       size="sm"
@@ -512,26 +554,33 @@ export default function Header() {
                       className="w-full flex items-center justify-center space-x-2 border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 py-3"
                     >
                       <LogOut className="w-4 h-4" />
-                      <span>Logout</span>
+                      <span>{t('auth.logout')}</span>
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <Link href="/auth/login" className="block">
+                    {' '}
+                    <Link
+                      href={`/${currentLocale}/auth/login`}
+                      className="block"
+                    >
                       <Button
                         variant="outline"
                         size="sm"
                         className="w-full border-2 border-amber-300 text-amber-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:border-purple-500 dark:text-purple-300 dark:hover:from-purple-900/50 dark:hover:to-blue-900/50 transition-all duration-300 py-3"
                       >
-                        Login
+                        {t('auth.login')}
                       </Button>
                     </Link>
-                    <Link href="/auth/login" className="block">
+                    <Link
+                      href={`/${currentLocale}/auth/login`}
+                      className="block"
+                    >
                       <Button
                         size="sm"
                         className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white dark:from-purple-600 dark:to-blue-600 dark:hover:from-purple-700 dark:hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 py-3"
                       >
-                        Sign Up
+                        {t('auth.signUp')}
                       </Button>
                     </Link>
                   </div>

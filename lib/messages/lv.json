@@ -1,20 +1,180 @@
-{
-  "hero": {
+{  "hero": {
     "title": "Sekojiet saviem mīļākajiem filmām un TV seriāliem",
-    "subtitle": "Izveidojiet savu personīgo filmu bibliotēku, sazinieties ar draugiem un atklājiet jaunu saturu kopā."
-  },
-  "features": {
+    "subtitle": "Izveidojiet savu personīgo filmu bibliotēku, sazinieties ar draugiem un atklājiet jaunu saturu kopā.",
+    "watchTitle": "Sekojiet",
+    "watchSubtitle": "savām mīļākajām",
+    "watchContent": "filmām",
+    "buttons": {
+      "goToDashboard": "Doties uz paneli",
+      "findFriends": "Atrast draugus",
+      "startJourney": "Sākt ceļojumu",
+      "learnMore": "Uzzināt vairāk"
+    },
+    "stats": {
+      "moviesInDatabase": "Filmas datubāzē",
+      "seriesInDatabase": "Seriāli datubāzē",
+      "activeUsers": "Aktīvi lietotāji"
+    },
+    "welcomeBack": "Laipni lūdzam atpakaļ, {name}!",
+    "readyToContinue": "Gatavi turpināt veidot savu filmu kolekciju?",
+    "personalStats": {
+      "moviesAndSeries": "Filmas un seriāli",
+      "friends": "Draugi",
+      "reviews": "Atsauksmes"
+    },
+    "personalLibrary": {
+      "title": "Personālā bibliotēka",
+      "description": "Pārvaldiet kolekciju"
+    }
+  },"features": {
     "title": "Viss, kas jums nepieciešams",
-    "subtitle": "Spēcīgas funkcijas, lai uzlabotu jūsu filmu un TV seriālu pieredzi"
+    "subtitle": "Spēcīgas funkcijas, lai uzlabotu jūsu filmu un TV seriālu pieredzi",
+    "library": {
+      "title": "Personīgā bibliotēka",
+      "description": "Izveidojiet un pārvaldiet savu personīgo filmu un TV seriālu kolekciju"
+    },
+    "friends": {
+      "title": "Saziņa ar draugiem",
+      "description": "Pievienojiet draugus un skatieties, ko viņi skatās un viņu ieteikumus"
+    },
+    "ratings": {
+      "title": "Vērtējumi un atsauksmes",
+      "description": "Novērtējiet filmas un seriālus, rakstiet atsauksmes un dalieties ar viedokļiem"
+    },
+    "discover": {
+      "title": "Atklājiet saturu",
+      "description": "Saņemiet personalizētus ieteikumus, pamatojoties uz jūsu gaumēm"
+    }
   },
   "cta": {
     "title": "Gatavs sākt savu ceļojumu?",
     "subtitle": "Pievienojieties tūkstošiem filmu entuziastu, kas jau izmanto mūsu platformu",
     "button": "Reģistrēties bez maksas"
   },
+  "profile": {
+    "title": "Mans profils",
+    "subtitle": "Pārvaldiet savu kontu un iestatījumus",
+    "back": "Atpakaļ",
+    "info": {
+      "title": "Profila informācija",
+      "role": "Loma",
+      "registrationDate": "Reģistrācijas datums",
+      "lastUpdate": "Pēdējais atjauninājums"
+    },
+    "tabs": {
+      "editProfile": "Rediģēt profilu",
+      "changePassword": "Mainīt paroli"
+    },
+    "form": {
+      "basicInfo": "Pamata informācija",
+      "avatar": "Profila attēls",
+      "firstName": "Vārds",
+      "firstNamePlaceholder": "Jūsu vārds",
+      "lastName": "Uzvārds",
+      "lastNamePlaceholder": "Jūsu uzvārds",
+      "email": "E-pasts",
+      "emailPlaceholder": "jūsu@epasts.lv",
+      "phone": "Tālrunis (nav obligāts)",
+      "phonePlaceholder": "+371 26 123 456",
+      "currentPassword": "Pašreizējā parole",
+      "currentPasswordPlaceholder": "Ievadiet pašreizējo paroli",
+      "newPassword": "Jaunā parole",
+      "newPasswordPlaceholder": "Ievadiet jauno paroli (vismaz 6 simboli)",
+      "confirmPassword": "Apstipriniet jauno paroli",
+      "confirmPasswordPlaceholder": "Apstipriniet jauno paroli",
+      "save": "Saglabāt izmaiņas",
+      "saving": "Saglabā...",
+      "changePassword": "Mainīt paroli",
+      "changing": "Maina..."
+    },    "messages": {
+      "profileUpdated": "Profils atjaunināts",
+      "passwordChanged": "Parole nomainīta",
+      "passwordMismatch": "Jaunās paroles nesakrīt",
+      "passwordTooShort": "Parolei jābūt vismaz 6 simbolus garai",
+      "profileUpdateError": "Neizdevās atjaunināt profilu",
+      "passwordChangeError": "Neizdevās nomainīt paroli",      "profileLoadError": "Neizdevās ielādēt profilu",
+      "changesSaved": "Izmaiņas saglabātas!"
+    },    "stats": {
+      "moviesWatched": "Filmas",
+      "tvSeries": "Seriāli"
+    },
+    "completion": {
+      "title": "Profila pilnība",
+      "avatar": "Profila fotogrāfija",
+      "firstName": "Vārds",
+      "lastName": "Uzvārds",
+      "email": "E-pasta adrese",
+      "phone": "Tālruņa numurs",
+      "complete": "Profils pabeigts!",
+      "almostComplete": "Gandrīz gatavs",
+      "halfComplete": "Uz ceļa",
+      "justStarted": "Tikko sākts",
+      "tip": "Aizpildiet savu profilu, lai iegūtu vislabāko no mūsu platformas!"
+    },
+    "avatar": {
+      "invalidFileType": "Nederīgs faila tips. Atļauti tikai JPEG, PNG, JPG, WEBP",
+      "fileTooLarge": "Fails pārāk liels. Maksimālais izmērs: 5MB",
+      "uploadSuccess": "Profila attēls atjaunināts",
+      "uploadError": "Neizdevās augšupielādēt profila attēlu"    }
+  },
+  "header": {
+    "navigation": {
+      "home": "Sākums",
+      "movies": "Filmas",
+      "tvSeries": "Seriāli",
+      "list": "Saraksts",
+      "friends": "Draugi",
+      "about": "Par mums",
+      "watch": "Skatīties"
+    },
+    "auth": {
+      "login": "Pieteikties",
+      "logout": "Iziet",
+      "signUp": "Reģistrēties",
+      "myProfile": "Mans profils",
+      "goToProfile": "Doties uz profilu"
+    },
+    "settings": {
+      "language": "Valoda",
+      "theme": "Tēma",
+      "themes": {
+        "light": "Gaiša",
+        "dark": "Tumša",
+        "system": "Sistēmas"
+      }
+    }
+  },
   "footer": {
-    "description": "Jūsu personālā filmu un TV seriālu izsekošanas platforma.",
+    "description": "Jūsu personālā filmu un Seriālu izsekošanas platforma.",
     "madeWith": "Izveidots ar",
-    "forMovieLovers": "filmu mīļotājiem"
+    "forMovieLovers": "filmu mīļotājiem",
+    "navigation": {
+      "title": "Navigācija",
+      "home": "Sākums",
+      "about": "Par mums",
+      "list": "Saraksts",
+      "friends": "Draugi"
+    },
+    "features": {
+      "title": "Iespējas",
+      "library": "Personīgā bibliotēka",
+      "social": "Sociālās funkcijas",
+      "recommendations": "Ieteikumi",
+      "reviews": "Atsauksmes un vērtējumi"
+    },
+    "support": {
+      "title": "Atbalsts un juridiskā informācija",
+      "privacy": "Privātuma politika",
+      "terms": "Lietošanas noteikumi",
+      "contact": "Sazināties ar atbalstu",
+      "help": "Palīdzības centrs"
+    },
+    "copyright": "© {year} SVN. Visas tiesības aizsargātas.",
+    "stats": {
+      "movies": "Filmas",
+      "tvSeries": "Seriāli",
+      "users": "Lietotāji",
+      "hours": "Noskatīšanās stundas"
+    }
   }
 }

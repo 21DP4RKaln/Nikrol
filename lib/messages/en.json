@@ -1,7 +1,31 @@
-{
-  "hero": {
+{  "hero": {
     "title": "Track Your Favorite Movies & TV Shows",
-    "subtitle": "Create your personal movie library, connect with friends, and discover new content together."
+    "subtitle": "Create your personal movie library, connect with friends, and discover new content together.",
+    "watchTitle": "Track",
+    "watchSubtitle": "your favorite",
+    "watchContent": "movies",
+    "buttons": {
+      "goToDashboard": "Go to Dashboard",
+      "findFriends": "Find Friends",
+      "startJourney": "Start Journey",
+      "learnMore": "Learn More"
+    },
+    "stats": {
+      "moviesInDatabase": "Movies in Database",
+      "seriesInDatabase": "Series in Database",
+      "activeUsers": "Active Users"
+    },
+    "welcomeBack": "Welcome back, {name}!",
+    "readyToContinue": "Ready to continue building your movie collection?",
+    "personalStats": {
+      "moviesAndSeries": "Movies & Series",
+      "friends": "Friends",
+      "reviews": "Reviews"
+    },
+    "personalLibrary": {
+      "title": "Personal Library",
+      "description": "Manage your collection"
+    }
   },
   "features": {
     "title": "Everything You Need",
@@ -86,6 +110,99 @@
       "subtitle": "Start building your movie library and connecting with fellow enthusiasts today.",
       "signup": "Sign Up Free",
       "home": "Back to Home"
+    }  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your account and settings",
+    "back": "Back",
+    "info": {
+      "title": "Profile Information",
+      "role": "Role",
+      "registrationDate": "Registration Date",
+      "lastUpdate": "Last Update"
+    },
+    "tabs": {
+      "editProfile": "Edit Profile",
+      "changePassword": "Change Password"
+    },
+    "form": {
+      "basicInfo": "Basic Information",
+      "avatar": "Profile Avatar",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Your last name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "phone": "Phone (optional)",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password (minimum 6 characters)",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "changePassword": "Change Password",
+      "changing": "Changing..."
+    },    "messages": {
+      "profileUpdated": "Profile updated successfully",
+      "passwordChanged": "Password changed successfully",
+      "passwordMismatch": "New passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "profileUpdateError": "Failed to update profile",
+      "passwordChangeError": "Failed to change password",
+      "profileLoadError": "Failed to load profile",
+      "changesSaved": "Changes Saved!"
+    },    "stats": {
+      "moviesWatched": "Movies",
+      "tvSeries": "Series"
+    },
+    "completion": {
+      "title": "Profile Completion",
+      "avatar": "Profile Photo",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "complete": "Profile Complete!",
+      "almostComplete": "Almost Complete",
+      "halfComplete": "Getting There",
+      "justStarted": "Just Getting Started",
+      "tip": "Complete your profile to get the most out of our platform!"
+    },
+    "avatar": {
+      "invalidFileType": "Invalid file type. Only JPEG, PNG, JPG, WEBP are allowed",
+      "fileTooLarge": "File too large. Maximum size: 5MB",
+      "uploadSuccess": "Avatar updated successfully",
+      "uploadError": "Failed to upload avatar"    }
+  },
+  "header": {
+    "navigation": {
+      "home": "Home",
+      "movies": "Movies",
+      "tvSeries": "TV Series",
+      "list": "List",
+      "friends": "Friends",
+      "about": "About",
+      "watch": "Watch"
+    },
+    "auth": {
+      "login": "Login",
+      "logout": "Logout",
+      "signUp": "Sign Up",
+      "myProfile": "My Profile",
+      "goToProfile": "Go to profile"
+    },
+    "settings": {
+      "language": "Language",
+      "theme": "Theme",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
     }
   },
   "footer": {
@@ -94,15 +211,21 @@
       "title": "Navigation",
       "home": "Home",
       "about": "About",
+      "list": "List",
       "dashboard": "Dashboard",
       "friends": "Friends"
-    },
-    "features": {
+    },    "features": {
       "title": "Features",
       "library": "Personal Library",
       "social": "Social Features",
       "recommendations": "Recommendations",
       "reviews": "Reviews & Ratings"
+    },
+    "stats": {
+      "movies": "Movies",
+      "tvSeries": "Series",
+      "users": "Users",
+      "hours": "Hours Watched"
     },
     "support": {
       "title": "Support & Legal",
